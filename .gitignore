@@ -14,7 +14,14 @@ dist/
 downloads/
 eggs/
 .eggs/
+
+# Ignore lib directories generally
 lib/
+
+# Track the frontend shared library directory
+!frontend/src/lib/
+!frontend/src/lib/**
+
 lib64/
 parts/
 sdist/
