@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from services.auth_services.app.data.User import User
 from shared.repositories.db_repository import DBRepository
 
