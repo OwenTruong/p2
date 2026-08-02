@@ -79,7 +79,7 @@ class DBRepository(ABC):
       cursor.execute(table_query)
       logging.info(f"Schema integrity verified: {self._table_name} table is in database.")
 
-  def _execute_fetch_one[M: BaseModel](self, query: str, model: type[M], vars: list | None = None) -> M:
+  def _execute_fetch_one[M: BaseModel](self, query: str, model: type[M], values: list | None = None) -> M:
     """Basic protected method for fetch one queries.
 
     Raises:
@@ -87,7 +87,7 @@ class DBRepository(ABC):
       - NoFetchedResultException
     """
     with self.__Cursor() as cursor:
-        cursor.execute(query, vars)
+        cursor.execute(query, values)
         row = cursor.fetchone()
         if row is None:
           raise NoFetchedResultException("Fetched row is None after query.")
@@ -95,14 +95,14 @@ class DBRepository(ABC):
 
         return model.model_validate(row)
 
-  def _execute_fetch_all[M: BaseModel](self, query: str, model: type[M], vars: list | None = None) -> list[M]:
+  def _execute_fetch_all[M: BaseModel](self, query: str, model: type[M], values: list | None = None) -> list[M]:
     """Basic protected method for fetch all queries.
 
     Raises:
       - DatabaseConnectionException
     """
     with self.__Cursor() as cursor:
-        cursor.execute(query, vars)
+        cursor.execute(query, values)
         rows = cursor.fetchall()
         logging.info(f"Successfully executed and fetched rows from {self._table_name}")
 
@@ -113,14 +113,14 @@ class DBRepository(ABC):
 
         return models
 
-  def _execute(self, query: str, vars: list | None = None) -> None:
+  def _execute(self, query: str, values: list | None = None) -> None:
     """Basic protected method for queries that don't need any values returned.
 
     Raises:
       - DatabaseConnectionException
     """
     with self.__Cursor() as cursor:
-        cursor.execute(query, vars)
+        cursor.execute(query, values)
         logging.info(f"Successfully executed {self._table_name}")
 
 

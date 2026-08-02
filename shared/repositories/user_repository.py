@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from shared.data.Users import Users
-from shared.repositories.repository import DBRepository
+from shared.repositories.db_repository import DBRepository
 
 class UserRepository(DBRepository):
   def __init__(self):
