@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shared.data.Users import Users
+from services.auth_services.app.data.User import User
 from shared.repositories.db_repository import DBRepository
 
 class UserRepository(DBRepository):
@@ -27,13 +27,13 @@ class UserRepository(DBRepository):
 
     super().__init__(table_name, table_query)
 
-  def save(self, email: str, password_hash: str, first_name: str, last_name: str) -> Users:
+  def save(self, email: str, password_hash: str, first_name: str, last_name: str) -> User:
     query = f"INSERT INTO {self._table_name} (email, password_hash, first_name, last_name) VALUES(%s, %s, %s, %s) RETURNING *;"
-    return self._execute_fetch_one(query, Users, values=[email, password_hash, first_name, last_name])
+    return self._execute_fetch_one(query, User, values=[email, password_hash, first_name, last_name])
 
-  def find_by_id(self, users_id: int) -> Users:
+  def find_by_id(self, users_id: int) -> User:
     query = f"SELECT * FROM {self._table_name} WHERE users_id=%s"
-    return self._execute_fetch_one(query, Users, values=[users_id])
+    return self._execute_fetch_one(query, User, values=[users_id])
 
   def delete_by_id(self, users_id: int) -> None:
     query = f"DELETE FROM {self._table_name} WHERE users_id=%s"
