@@ -1,4 +1,4 @@
-name: Terraform Infrastructure
+name: SpaceBnB CI/CD
 
 on:
   pull_request:
@@ -6,6 +6,9 @@ on:
       - architecture
     paths:
       - "infrastructure/**"
+      - "services/**"
+      - "frontend/**"
+      - "deployment/**"
       - ".github/workflows/cicd.yml"
 
   push:
@@ -13,6 +16,9 @@ on:
       - architecture
     paths:
       - "infrastructure/**"
+      - "services/**"
+      - "frontend/**"
+      - "deployment/**"
       - ".github/workflows/cicd.yml"
 
   workflow_dispatch:
@@ -22,8 +28,8 @@ permissions:
   id-token: write
 
 env:
-  AZURE_LOCATION: "canadaeast"
-  
+  AZURE_LOCATION: canadaeast
+
   TF_VERSION: "1.9.8"
   TF_WORKING_DIR: infrastructure
   TF_IN_AUTOMATION: "true"
@@ -43,15 +49,32 @@ env:
   TF_VAR_location: canadaeast
   TF_VAR_environment: dev
 
+  IMAGE_NAME: sample-service
+  IMAGE_CONTEXT: services/sample-service
+  IMAGE_DOCKERFILE: services/sample-service/Dockerfile
+
+  K8S_DEPLOYMENT_NAME: sample-service
+  K8S_CONTAINER_NAME: sample-service
+
 jobs:
+  # ============================================================
+  # 1. TERRAFORM
+  # ============================================================
+
   terraform:
+    name: Provision Azure infrastructure
     runs-on: ubuntu-latest
+
+    outputs:
+      resource-group-name: ${{ steps.terraform-outputs.outputs.resource-group-name }}
+      aks-cluster-name: ${{ steps.terraform-outputs.outputs.aks-cluster-name }}
+      acr-name: ${{ steps.terraform-outputs.outputs.acr-name }}
+      acr-login-server: ${{ steps.terraform-outputs.outputs.acr-login-server }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # GitHub receives a short-lived Azure token through OIDC.
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -64,10 +87,9 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      # ------------------------------------------------------------
-      # BOOTSTRAP
-      # Creates the storage for Terraform state.
-      # ------------------------------------------------------------
+      # ----------------------------------------------------------
+      # Bootstrap the Terraform remote backend
+      # ----------------------------------------------------------
 
       - name: Ensure Terraform backend exists
         shell: bash
@@ -81,14 +103,14 @@ jobs:
             --location "$AZURE_LOCATION" \
             --output none
 
-          echo "Checking backend Storage account..."
+          echo "Checking backend Storage Account..."
 
           if ! az storage account show \
             --name "$TFSTATE_STORAGE_ACCOUNT" \
             --resource-group "$TFSTATE_RESOURCE_GROUP" \
             --output none 2>/dev/null
           then
-            echo "Storage account does not exist; creating it..."
+            echo "Creating backend Storage Account..."
 
             az storage account create \
               --name "$TFSTATE_STORAGE_ACCOUNT" \
@@ -100,10 +122,10 @@ jobs:
               --allow-blob-public-access false \
               --output none
           else
-            echo "Storage account already exists; skipping creation."
+            echo "Backend Storage Account already exists."
           fi
 
-          echo "Ensuring state container exists..."
+          echo "Ensuring backend Blob container exists..."
 
           az storage container create \
             --name "$TFSTATE_CONTAINER" \
@@ -111,12 +133,9 @@ jobs:
             --auth-mode login \
             --output none
 
-          echo "Terraform backend is ready."
-
-      # ------------------------------------------------------------
-      # PLATFORM
-      # Uses the backend above to track the actual infrastructure.
-      # ------------------------------------------------------------
+      # ----------------------------------------------------------
+      # Validate and plan Terraform
+      # ----------------------------------------------------------
 
       - name: Terraform format check
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -142,9 +161,171 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
 
-      # Pull requests only produce a plan.
-      # Merges/pushes to the branch perform the apply.
+      # Pull requests stop after plan.
       - name: Terraform apply
         if: github.event_name == 'push'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve tfplan
+
+      # Outputs only exist after infrastructure has been applied.
+      - name: Read Terraform outputs
+        id: terraform-outputs
+        if: github.event_name == 'push'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RESOURCE_GROUP_NAME="$(terraform output -raw resource_group_name)"
+          AKS_CLUSTER_NAME="$(terraform output -raw aks_cluster_name)"
+          ACR_NAME="$(terraform output -raw acr_name)"
+          ACR_LOGIN_SERVER="$(terraform output -raw acr_login_server)"
+
+          echo "resource-group-name=$RESOURCE_GROUP_NAME" >> "$GITHUB_OUTPUT"
+          echo "aks-cluster-name=$AKS_CLUSTER_NAME" >> "$GITHUB_OUTPUT"
+          echo "acr-name=$ACR_NAME" >> "$GITHUB_OUTPUT"
+          echo "acr-login-server=$ACR_LOGIN_SERVER" >> "$GITHUB_OUTPUT"
+
+          echo "Resource group: $RESOURCE_GROUP_NAME"
+          echo "AKS cluster: $AKS_CLUSTER_NAME"
+          echo "ACR: $ACR_NAME"
+          echo "ACR login server: $ACR_LOGIN_SERVER"
+
+  # ============================================================
+  # 2. BUILD AND PUSH IMAGE
+  # ============================================================
+
+  build-and-push:
+    name: Build and push sample service
+    runs-on: ubuntu-latest
+
+    needs:
+      - terraform
+
+    # Do not build images for pull-request validation.
+    if: github.event_name == 'push'
+
+    outputs:
+      image-reference: ${{ steps.image.outputs.image-reference }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_ARCHITECTURE }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID_ARCHITECTURE }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
+
+      - name: Login to ACR
+        run: |
+          az acr login \
+            --name "${{ needs.terraform.outputs.acr-name }}"
+
+      - name: Define immutable image reference
+        id: image
+        shell: bash
+        run: |
+          IMAGE_REFERENCE="${{ needs.terraform.outputs.acr-login-server }}/${IMAGE_NAME}:${GITHUB_SHA}"
+
+          echo "image-reference=$IMAGE_REFERENCE" >> "$GITHUB_OUTPUT"
+          echo "Building image: $IMAGE_REFERENCE"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --file "$IMAGE_DOCKERFILE" \
+            --tag "${{ steps.image.outputs.image-reference }}" \
+            "$IMAGE_CONTEXT"
+
+      - name: Push Docker image
+        run: |
+          docker push "${{ steps.image.outputs.image-reference }}"
+
+  # ============================================================
+  # 3. DEPLOY TO AKS
+  # ============================================================
+
+  deploy-to-aks:
+    name: Deploy sample service to AKS
+    runs-on: ubuntu-latest
+
+    needs:
+      - terraform
+      - build-and-push
+
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_ARCHITECTURE }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID_ARCHITECTURE }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group "${{ needs.terraform.outputs.resource-group-name }}" \
+            --name "${{ needs.terraform.outputs.aks-cluster-name }}" \
+            --overwrite-existing
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Render Deployment manifest
+        env:
+          IMAGE_REFERENCE: ${{ needs.build-and-push.outputs.image-reference }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p rendered
+
+          sed "s|IMAGE_PLACEHOLDER|$IMAGE_REFERENCE|g" \
+            deployment/sample-service/deployment.yaml \
+            > rendered/sample-service-deployment.yaml
+
+          echo "Rendered container image:"
+          grep "image:" rendered/sample-service-deployment.yaml
+
+      - name: Validate Kubernetes manifests
+        run: |
+          kubectl apply \
+            --dry-run=server \
+            -f rendered/sample-service-deployment.yaml \
+            -f deployment/sample-service/service.yaml \
+            -f deployment/ingress.yaml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply \
+            -f rendered/sample-service-deployment.yaml \
+            -f deployment/sample-service/service.yaml \
+            -f deployment/ingress.yaml
+
+      - name: Wait for Deployment rollout
+        run: |
+          kubectl rollout status \
+            deployment/"$K8S_DEPLOYMENT_NAME" \
+            --timeout=300s
+
+      - name: Show deployed resources
+        run: |
+          kubectl get deployment "$K8S_DEPLOYMENT_NAME"
+          kubectl get pods \
+            -l app="$K8S_DEPLOYMENT_NAME"
+
+          kubectl get service sample-service
+          kubectl get ingress spacebnb-ingress
