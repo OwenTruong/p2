@@ -33,6 +33,12 @@ env:
   TFSTATE_CONTAINER: spacebnb-tfstate
   TFSTATE_KEY: dev.terraform.tfstate
 
+  ARM_USE_OIDC: "true"
+  ARM_USE_AZUREAD: "true"
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_ARCHITECTURE }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID_ARCHITECTURE }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
+
   TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
   TF_VAR_location: canadaeast
   TF_VAR_environment: dev
@@ -125,6 +131,7 @@ jobs:
             -backend-config="storage_account_name=$TFSTATE_STORAGE_ACCOUNT" \
             -backend-config="container_name=$TFSTATE_CONTAINER" \
             -backend-config="key=$TFSTATE_KEY" \
+            -backend-config="use_oidc=true" \
             -backend-config="use_azuread_auth=true"
 
       - name: Terraform validate
