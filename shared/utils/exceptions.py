@@ -8,3 +8,6 @@ class DatabaseConnectionException(Exception):
 
 class NoFetchedResultException(Exception):
   """Raised when a fetchone query returns nothing."""
+
+class UniqueRowException(Exception):
+  """Raised when a row insertion fails due to unique constraint"""

@@ -1,4 +1,43 @@
-version: "3.9"
-
+# NOTE: THIS COMPOSE FILE IS ONLY MEANT FOR DEVELOPMENT. PRODUCTION WILL BE USING KUBERNETES.
 services:
   # Development services will be added here.
+  auth_service:
+    build:
+      context: .
+      dockerfile: services/auth_services/Dockerfile
+    container_name: auth-server
+    env_file: '.env'
+    ports:
+      - '${AUTH_PORT}:${AUTH_PORT}'
+    environment:
+      DB_HOST: ${AUTH_DB_HOST}
+      DB_NAME: ${AUTH_DB_NAME}
+      DB_USER: ${AUTH_DB_USER}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      PASSWORD_SALT: ${PASSWORD_SALT}
+      AUTH_PORT: ${AUTH_PORT}
+    depends_on:
+      auth_db:
+        condition: service_healthy
+
+  auth_db:
+    image: postgres:15-alpine
+    container_name: database-server
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file: '.env'
+    ports:
+      - '${AUTH_DB_PORT}:${AUTH_DB_PORT}'
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      PGPORT: ${AUTH_DB_PORT}
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+
+volumes:
+  auth_pgdata:

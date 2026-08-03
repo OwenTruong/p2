@@ -1,4 +1,6 @@
-from services.auth_services.app.data.User import User
+from ..models.user import User
+from ..core.config import get_config
+
 from shared.repositories.db_repository import DBRepository
 
 class UserRepository(DBRepository):
@@ -23,7 +25,8 @@ class UserRepository(DBRepository):
       );
     """
 
-    super().__init__(table_name, table_query)
+    config = get_config()
+    super().__init__(table_name, table_query, config)
 
   def save(self, user: User) -> User:
     if user.user_id == None:
