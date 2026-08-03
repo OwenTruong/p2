@@ -22,15 +22,20 @@ permissions:
   id-token: write
 
 env:
+  AZURE_LOCATION: "canadaeast"
+  
   TF_VERSION: "1.9.8"
   TF_WORKING_DIR: infrastructure
+  TF_IN_AUTOMATION: "true"
 
   TFSTATE_RESOURCE_GROUP: spacebnb-tfstate-rg
   TFSTATE_STORAGE_ACCOUNT: spacebnbtfstate123
-  TFSTATE_CONTAINER: tfstate
+  TFSTATE_CONTAINER: spacebnb-tfstate
   TFSTATE_KEY: dev.terraform.tfstate
 
-  TF_IN_AUTOMATION: "true"
+  TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
+  TF_VAR_location: canadaeast
+  TF_VAR_environment: dev
 
 jobs:
   terraform:
@@ -48,43 +53,91 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID_ARCHITECTURE }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
 
-      - name: Verify Azure identity
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      # ------------------------------------------------------------
+      # BOOTSTRAP
+      # Creates the storage for Terraform state.
+      # ------------------------------------------------------------
+
+      - name: Ensure Terraform backend exists
+        shell: bash
         run: |
-          az account show \
-            --query '{subscription:name, subscriptionId:id, tenantId:tenantId}' \
-            --output table
-      # - name: Install Terraform
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: ${{ env.TF_VERSION }}
+          set -euo pipefail
 
-      # - name: Terraform format check
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: terraform fmt -check -recursive
+          echo "Ensuring backend resource group exists..."
 
-      # - name: Terraform initialize
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: |
-      #     terraform init \
-      #       -backend-config="resource_group_name=$TFSTATE_RESOURCE_GROUP" \
-      #       -backend-config="storage_account_name=$TFSTATE_STORAGE_ACCOUNT" \
-      #       -backend-config="container_name=$TFSTATE_CONTAINER" \
-      #       -backend-config="key=$TFSTATE_KEY" \
-      #       -backend-config="use_azuread_auth=true"
+          az group create \
+            --name "$TFSTATE_RESOURCE_GROUP" \
+            --location "$AZURE_LOCATION" \
+            --output none
 
-      # - name: Terraform validate
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: terraform validate
+          echo "Checking backend Storage account..."
 
-      # - name: Terraform plan
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   env:
-      #     TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
-      #   run: terraform plan -out=tfplan
+          if ! az storage account show \
+            --name "$TFSTATE_STORAGE_ACCOUNT" \
+            --resource-group "$TFSTATE_RESOURCE_GROUP" \
+            --output none 2>/dev/null
+          then
+            echo "Storage account does not exist; creating it..."
 
-      # # Pull requests stop after plan.
-      # # A push/merge to main applies the generated plan.
-      # - name: Terraform apply
-      #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: terraform apply -auto-approve tfplan
+            az storage account create \
+              --name "$TFSTATE_STORAGE_ACCOUNT" \
+              --resource-group "$TFSTATE_RESOURCE_GROUP" \
+              --location "$AZURE_LOCATION" \
+              --sku Standard_LRS \
+              --kind StorageV2 \
+              --min-tls-version TLS1_2 \
+              --allow-blob-public-access false \
+              --output none
+          else
+            echo "Storage account already exists; skipping creation."
+          fi
+
+          echo "Ensuring state container exists..."
+
+          az storage container create \
+            --name "$TFSTATE_CONTAINER" \
+            --account-name "$TFSTATE_STORAGE_ACCOUNT" \
+            --auth-mode login \
+            --output none
+
+          echo "Terraform backend is ready."
+
+      # ------------------------------------------------------------
+      # PLATFORM
+      # Uses the backend above to track the actual infrastructure.
+      # ------------------------------------------------------------
+
+      - name: Terraform format check
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform fmt -check -recursive
+
+      - name: Initialize Terraform
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -reconfigure \
+            -backend-config="resource_group_name=$TFSTATE_RESOURCE_GROUP" \
+            -backend-config="storage_account_name=$TFSTATE_STORAGE_ACCOUNT" \
+            -backend-config="container_name=$TFSTATE_CONTAINER" \
+            -backend-config="key=$TFSTATE_KEY" \
+            -backend-config="use_azuread_auth=true"
+
+      - name: Terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform plan -out=tfplan
+
+      # Pull requests only produce a plan.
+      # Merges/pushes to the branch perform the apply.
+      - name: Terraform apply
+        if: github.event_name == 'push'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan
