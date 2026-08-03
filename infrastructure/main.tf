@@ -49,7 +49,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   default_node_pool {
     name           = "system"
-    vm_size        = "Standard_B2s"
+    vm_size        = "Standard_B2ats_v2"
     node_count     = 1
     vnet_subnet_id = azurerm_subnet.aks.id
   }
