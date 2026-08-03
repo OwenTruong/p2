@@ -19,9 +19,9 @@ class UserRepository(DBRepository):
       return self._execute_fetch_one(query, User, values=[user.email, user.password_hash, user.first_name, user.last_name, user.status, user.user_id])
 
   def find_by_id(self, id: int) -> User:
-    query = f"SELECT * FROM {self._table_name} WHERE users_id=%s"
+    query = f"SELECT * FROM {self._table_name} WHERE user_id=%s"
     return self._execute_fetch_one(query, User, values=[id])
 
   def delete_by_id(self, id: int) -> None:
-    query = f"DELETE FROM {self._table_name} WHERE users_id=%s"
+    query = f"DELETE FROM {self._table_name} WHERE user_id=%s"
     return self._execute(query, values=[id])
