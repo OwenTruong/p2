@@ -35,28 +35,3 @@ async def get_health():
             }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
-
-# TODO: This is for testing purpose. JWT Auth and moving some of the logic code to service directory is needed.
-@app.post("/api/auth/register", status_code=status.HTTP_200_OK)
-async def register(payload: UserDTO):
-    try:
-        new_user = User(
-            email = payload.email,
-            password_hash = hashlib.pbkdf2_hmac(
-                hash_name = 'sha256',
-                password = payload.password.encode('utf-8'),
-                salt = config.password_salt.encode('utf-8'),
-                iterations = 600000
-            ).hex(),
-            first_name = payload.first_name,
-            last_name = payload.last_name,
-            status = 'Active'
-        )
-        user_repository.save(new_user)
-        return {"status": "success", "detail": f"Account for user `{payload.email}` has been provisioned"}
-    except UniqueRowException as exc:
-        logging.info(exc)
-        raise HTTPException(status_code=400, detail="User already exists")
-    except Exception as exc:
-        logging.error(exc)
-        raise HTTPException(status_code=500, detail="Internal Server Error")
