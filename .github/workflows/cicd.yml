@@ -47,7 +47,7 @@ env:
 
   TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID_ARCHITECTURE }}
   TF_VAR_github_actions_principal_id: ${{ vars.AZURE_SP_OBJECT_ID_ARCHITECTURE }}
-  TF_VAR_location: canadaeast
+  TF_VAR_location: koreacentral
   TF_VAR_environment: dev
 
   IMAGE_NAME: sample-service
