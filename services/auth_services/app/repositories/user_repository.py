@@ -5,28 +5,10 @@ from shared.repositories.db_repository import DBRepository
 
 class UserRepository(DBRepository):
   def __init__(self):
-    table_name = "users"
-    # see https://www.postgresql.org/docs/current/sql-do.html
-    table_query = f"""
-      DO $$
-      BEGIN
-        IF NOT EXISTS (Select 1 FROM pg_type WHERE typname = 'user_status') THEN
-          CREATE TYPE user_status as ENUM ('Active', 'Inactive');
-        END IF;
-      END $$;
-
-      CREATE TABLE IF NOT EXISTS {table_name} (
-        users_id BIGSERIAL PRIMARY KEY,
-        email VARCHAR(128) NOT NULL UNIQUE,
-        password_hash VARCHAR(128) NOT NULL,
-        first_name VARCHAR(64) NOT NULL,
-        last_name VARCHAR(64) NOT NULL,
-        status user_status NOT NULL DEFAULT 'Active'
-      );
-    """
+    table_name = 'users'
 
     config = get_config()
-    super().__init__(table_name, table_query, config)
+    super().__init__(table_name, config)
 
   def save(self, user: User) -> User:
     if user.user_id == None:

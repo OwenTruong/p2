@@ -66,26 +66,14 @@ class DBRepository(ABC):
 
             return False
 
-    def __init__(self, table_name: str, table_query: str, db_config: DBConfig):
+    def __init__(self, table_name: str, db_config: DBConfig):
         self._table_name = table_name
         self.__db_config = db_config
-        self.__ensure_table_exists(table_query)
 
 
     # TODO: Maybe add more errors/exceptions that may be thrown by psycopg2 inside method documentation
 
     # NOTE: using generic like "[M: BaseModel]" require Python 3.12+, generics can also be created in earlier Python but the syntax is a bit different.
-
-    def __ensure_table_exists(self, table_query: str):
-        """Initializes database schema structurally if missing
-        
-        Raises:
-            - DatabaseConnectionException
-            - UniqueRowException
-        """
-        with self.__Cursor(self.__db_config) as cursor:
-            cursor.execute(table_query)
-            logging.info(f"Schema integrity verified: {self._table_name} table is in database.")
 
     def _execute_fetch_one[M: BaseModel](self, query: str, model: type[M], values: list | None = None) -> M:
         """Basic protected method for fetch one queries.
