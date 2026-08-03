@@ -1,7 +1,6 @@
 # Declares inputs accepted by the Terraform configuration.
 # Terraform automatically maps TF_VAR_subscription_id (from env of cicd.yml) -> var.subscription_id
 
-and:
 variable "subscription_id" {
   description = "Azure subscription where resources are deployed."
   type        = string
