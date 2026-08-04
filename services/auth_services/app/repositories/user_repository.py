@@ -25,3 +25,7 @@ class UserRepository(DBRepository):
   def delete_by_id(self, id: int) -> None:
     query = f"DELETE FROM {self._table_name} WHERE user_id=%s"
     return self._execute(query, values=[id])
+  
+  def find_by_email(self, email: str) -> User | None:
+    query = f"SELECT * FROM {self._table_name} WHERE email=%s"
+    return self._execute_fetch_one(query, User, values=[email])
