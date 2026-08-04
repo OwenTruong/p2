@@ -4,10 +4,4 @@ A microservices-based rental booking platform demonstrating modern cloud-native 
 
 ## Local Development
 
-### Initializing and migrating database
-
-To initialize and migrate auth database for local development, run the following
-```python
-python3 -m services.auth_services.migrate
-```
-
+Check out the [local-development.md](/docs/local-development.md) for steps to set up and run the app locally.
