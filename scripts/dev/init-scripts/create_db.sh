@@ -7,6 +7,7 @@ DATABASES=(
   "${AUTH_DB_NAME:-auth_db_example}"
   "${LISTING_DB_NAME:-listing_db_example}"
   "${RESERVATION_DB_NAME:-reservation_db_example}"
+  "${SAMPLE_DB_NAME:-sample_db_example}"
 )
 
 echo "Creating databases: ${DATABASES[*]}"
