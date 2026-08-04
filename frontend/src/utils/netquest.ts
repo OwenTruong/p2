@@ -1,4 +1,4 @@
-import { StatusError } from './errors';
+import { StatusError } from '@/errors/StatusError';
 import { logger } from './utils';
 
 const fileLogger = logger.ns('netquest').seal();

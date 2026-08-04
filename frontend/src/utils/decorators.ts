@@ -1,5 +1,5 @@
 import adze from 'adze';
-import { UnexpectedError } from './errors';
+import { UnexpectedError } from '@/errors/UnexpectedError';
 
 export function safeBind<Args extends unknown[], Return>(
   targetFunction: (...args: Args) => Promise<Return>,
