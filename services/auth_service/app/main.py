@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 # First Party
 from .core.config import get_config
+from .dtos.user_dto import UserCreateRequestDTO
 from .models.user import User
 from .repositories.user_repository import UserRepository
 from .api.controllers import auth

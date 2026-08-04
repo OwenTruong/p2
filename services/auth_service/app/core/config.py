@@ -9,7 +9,7 @@ load_dotenv()
 # intentionally using invalid defaults to find error in config if any
 __config = Config(
   db_host = os.getenv("DB_HOST", "10.0.3.254"),
-  db_name = os.getenv("AUTH_DB_NAME", "my_db"),
+  db_name = os.getenv("DB_NAME", "my_db"),
   db_user = os.getenv("DB_USER", "my_db_user"),
   db_password = os.getenv("DB_PASSWORD", "MyPassword1234"),
   db_port = int(os.getenv("DB_PORT", 1000)),
