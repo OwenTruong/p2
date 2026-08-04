@@ -1,0 +1,41 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    margin: 0;
+}
+
+.createButton {
+    padding: 0.75rem 1.5rem;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #2563eb;
+    color: white;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.createButton:hover {
+    background-color: #1d4ed8;
+}
+
+.listingsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
