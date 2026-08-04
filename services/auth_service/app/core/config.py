@@ -15,7 +15,11 @@ __config = Config(
   db_port = int(os.getenv("DB_PORT", 1000)),
 
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
-  password_salt = os.getenv("PASSWORD_SALT", "MySaltyPassword1234")
+  password_salt = os.getenv("PASSWORD_SALT", "MySaltyPassword1234"),
+  
+  jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS"),
+  jwt_secret_key = os.getenv("JWT_SECRET_KEY", "secretkey"),
+  jwt_expiration = int(os.getenv("JWT_EXPIRATION", 15))
 )
 
 logging.debug(f"""Config Loaded:
@@ -27,6 +31,10 @@ logging.debug(f"""Config Loaded:
 
   mode: {__config.mode}
   password_salt: REDACTED
+  
+  jwt_algorithm: {__config.jwt_algorithm}
+  jwt_secret_key: REDACTED
+  jwt_expiration: {__config.jwt_expiration}
 """)
 
 
