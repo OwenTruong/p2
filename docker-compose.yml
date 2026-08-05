@@ -16,6 +16,18 @@ x-common-db-environment: &common-db-environment
 
 services:
   # Development services will be added here.
+  frontend_service:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: frontend-server
+    env_file: '.env'
+    ports:
+      - '${FRONTEND_PORT:-8000}:80'
+    environment:
+      <<: 
+        - *common-api-environment
+
   auth_service:
     build:
       context: .
