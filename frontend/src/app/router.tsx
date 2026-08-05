@@ -2,8 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import HomePage from '../features/home/pages/HomePage';
 import MyListingsPage from '../features/listings/pages/MyListingsPage';
-import LoginPage from '@/features/auth/pages/LoginPage';
-import RegisterPage from '@/features/auth/pages/RegisterPage';
+import LoginPage from '../features/auth/pages/LoginPage';
+import RegisterPage from '../features/auth/pages/RegisterPage';
 
 function CreateListingPage() {
   return <h1>Create Listing (Coming Soon)</h1>;
