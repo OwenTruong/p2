@@ -16,16 +16,18 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return hash_password(plain_password) == hashed_password
 
-def create_access_token(email: str) -> str:
+def create_access_token(user_id: int, email: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=config.jwt_expiration)
     payload = {
-        "sub": email,
+        "sub": str(user_id),
+        "email": email,
         "exp": expire
     }
     return jwt.encode(payload, config.jwt_secret_key, algorithm=config.jwt_algorithm)
 
 def decode_access_token(token: str) -> dict | None:
     try:
-        return jwt.decode(token, config.jwt_secret_key, algorithm=config.jwt_algorithm)
-    except jwt.PyJWTError:
+        return jwt.decode(token, config.jwt_secret_key, algorithms=[config.jwt_algorithm])
+    except jwt.PyJWTError as e:
+        print(f"JWT decode error: {e}")
         return None

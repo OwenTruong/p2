@@ -9,4 +9,4 @@ COPY services/auth_service/ .
 COPY shared/ /app/shared/
 
 # python -m uvicorn src.app:app --port 80 --host 0.0.0.0 --app-dir src
-CMD ["sh", "-c", "python -m uvicorn app.main:app --port 8000 --host 0.0.0.0"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
