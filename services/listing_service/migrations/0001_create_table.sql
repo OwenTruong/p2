@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS listings (
   price_per_night NUMERIC(10, 2) NOT NULL,
   max_guests INT NOT NULL,
   bedrooms INT NOT NULL,
+  bathrooms INT NOT NULL,
   status listing_status NOT NULL DEFAULT 'Available'
 );

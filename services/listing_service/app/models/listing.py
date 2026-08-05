@@ -10,4 +10,5 @@ class Listing(BaseModel):
     price_per_night: float = Field(gt=0, examples=[120.00])
     max_guests: int = Field(ge=1, examples=[4])
     bedrooms: int = Field(ge=0, examples=[2])
+    bathrooms: int = Field(ge=0, examples=[1])
     status: Literal["Available", "Unavailable"] = Field(default="Available", examples=["Available"])
