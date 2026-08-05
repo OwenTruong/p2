@@ -5,6 +5,7 @@ from app.repositories.user_repository import UserRepository
 from app.services.auth_service import AuthService
 from app.core.config import get_config
 
+from app.api.dependencies import get_current_user
 from shared.utils.exceptions import UniqueRowException
 
 config = get_config()
@@ -53,3 +54,9 @@ def logout(response: Response):
         secure=False
     )
     return {"status": "success", "detail": "Successfully logged out"}
+
+@router.get("/test/protected", status_code=status.HTTP_200_OK)
+def test_protected_route(
+    current_user = Depends(get_current_user)
+):
+    return {"status": "success", "detail": "You have accessed a protected route!"}
