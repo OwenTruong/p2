@@ -2,7 +2,8 @@ from fastapi import HTTPException, status
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
 from app.dtos.auth import LoginRequest
-from app.core.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token, hash_password
+from app.dtos.user_dto import UserCreateRequestDTO
 
 
 class AuthService:
@@ -27,3 +28,11 @@ class AuthService:
         token = create_access_token(user.user_id, user.email)
         return user, token
 
+    def save_user(self, dto: UserCreateRequestDTO) -> User:
+        user = User(
+            email=dto.email,
+            password_hash=hash_password(dto.password),
+            first_name=dto.first_name,
+            last_name=dto.last_name
+        )
+        return self.user_repo.save(user)
