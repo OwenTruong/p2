@@ -1,30 +1,35 @@
-from fastapi import APIRouter, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from app.dtos.auth import LoginRequest, AuthSuccessResponse
 from app.dtos.user_dto import UserCreateRequestDTO
 from app.repositories.user_repository import UserRepository
 from app.services.auth_service import AuthService
 from app.core.config import get_config
-from app.core.security import hash_password
-from app.models.user import User
-import psycopg2
+
+from shared.utils.exceptions import UniqueRowException
 
 config = get_config()
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
-auth_service = AuthService()
-user_repository = UserRepository()
 
-#Register Endpoint 
+def get_auth_service() -> AuthService:
+    return AuthService()
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(dto: UserCreateRequestDTO):
+def register(
+    dto: UserCreateRequestDTO,
+    auth_service: AuthService = Depends(get_auth_service)
+):
     try:
-        user = User(email = dto.email, password_hash=hash_password(dto.password), first_name=dto.first_name, last_name=dto.last_name)
-        user_repository.save(user)
-        return {"status": "success", "detail": f"Account for user `{dto.email}` has been provisioned"}
-    except Exception as exc:
-        raise HTTPException(status_code=409, detail=str(exc))
+        saved_user = auth_service.save_user(dto)
+        return {"status": "success", "detail": f"Account for user `{saved_user.email}` has been provisioned"}
+    except UniqueRowException:
+        raise HTTPException(status_code=409, detail="User with this email already exists")
 
 @router.post("/login", response_model=AuthSuccessResponse, status_code=status.HTTP_200_OK)
-def login(dto: LoginRequest, response: Response):
+def login(
+    dto: LoginRequest, 
+    response: Response,
+    auth_service: AuthService = Depends(get_auth_service)
+):
     _, token = auth_service.authenticate_user(dto)
     
     response.set_cookie(
