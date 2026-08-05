@@ -24,7 +24,8 @@ class AuthService:
                 detail="account is inactive"
             )
 
-        token = create_access_token(user.email)
+        assert user.user_id is not None, "Database record must have an ID"
+        token = create_access_token(user.user_id, user.email)
         return user, token
 
     def save_user(self, dto: UserCreateRequestDTO) -> User:
