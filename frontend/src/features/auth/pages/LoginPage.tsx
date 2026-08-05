@@ -1,6 +1,6 @@
 import { logger } from '@/utils/utils';
 
-const loginLogger = logger.ns('page', 'Signing').seal();
+const loginLogger = logger.ns('page', 'Login').seal();
 
 export default function Page() {
   return <div>Login Page</div>;
