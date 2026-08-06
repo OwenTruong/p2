@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useUser } from '@/features/auth/userContext';
+import { useUser } from "@/features/auth/userContext";
 
 // import { logger } from '@/utils/utils';
-import type { LoginDTO } from '../types/LoginDTO';
+import type { LoginDTO } from "../types/LoginDTO";
 
 // const loginLogger = logger.ns('page', 'Login').seal();
 
@@ -12,8 +12,8 @@ export default function Page() {
   const { userAuth, login } = useUser();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,15 +22,15 @@ export default function Page() {
   useEffect(() => {
     if (!pending.current) return;
 
-    if (userAuth.status === 'authenticated') {
+    if (userAuth.status === "authenticated") {
       pending.current = false;
       setSubmitting(false);
-      navigate('/', { replace: true });
-    } else if (userAuth.status === 'unauthenticated') {
+      navigate("/", { replace: true });
+    } else if (userAuth.status === "unauthenticated") {
       pending.current = false;
       setSubmitting(false);
       setFormError(
-        userAuth.error?.message ?? 'Unable to sign in. Please try again.',
+        userAuth.error?.message ?? "Unable to sign in. Please try again.",
       );
     }
   }, [userAuth, navigate]);
@@ -89,7 +89,7 @@ export default function Page() {
 
           <div>
             <button type="submit" disabled={submitting}>
-              {submitting ? 'Signing in…' : 'Sign in'}
+              {submitting ? "Signing in…" : "Sign in"}
             </button>
           </div>
         </form>

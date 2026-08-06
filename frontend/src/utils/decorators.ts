@@ -1,5 +1,5 @@
-import adze from 'adze';
-import { UnexpectedError } from '@/errors/UnexpectedError';
+import adze from "adze";
+import { UnexpectedError } from "@/errors/UnexpectedError";
 
 export function safeBind<Args extends unknown[], Return>(
   targetFunction: (...args: Args) => Promise<Return>,
@@ -24,7 +24,7 @@ export function safeBind<Args extends unknown[], Return>(
       return await targetFunction(...args);
     } catch (error: unknown) {
       if (!(error instanceof Error)) {
-        const funcName = targetFunction.name || 'anonymousFunction';
+        const funcName = targetFunction.name || "anonymousFunction";
 
         logger.error(`Failed to run ${funcName}`);
         logger.verbose(`Error: ${error}`);
@@ -129,18 +129,18 @@ export function Retry<This, Args extends unknown[], Return>(
         try {
           return await originalMethod.call(this, ...args);
         } catch (err: unknown) {
-          const funcName = originalMethod.name || 'anonymousFunction';
+          const funcName = originalMethod.name || "anonymousFunction";
           const isLastAttempt = i + 1 === retryCount;
 
           if (!(err instanceof Error)) {
             logger.error(
-              `Failed to run ${funcName}${isLastAttempt ? '' : '. Retrying...'}`,
+              `Failed to run ${funcName}${isLastAttempt ? "" : ". Retrying..."}`,
             );
             logger.verbose(`Error: ${err}`);
             error = new UnexpectedError(`Failed to run ${funcName}`);
           } else {
             logger.error(
-              `Failed to run ${funcName}${isLastAttempt ? '' : '. Retrying...'}`,
+              `Failed to run ${funcName}${isLastAttempt ? "" : ". Retrying..."}`,
             );
             logger.verbose(`Error: ${err.message}`);
             error = err;

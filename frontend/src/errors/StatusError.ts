@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 export class StatusError extends Error {
   code: string;
@@ -18,7 +18,7 @@ export class StatusError extends Error {
     ) {
       this.code = code;
     } else {
-      throw new Error('Internal Error: Invalid StatusError parameters');
+      throw new Error("Internal Error: Invalid StatusError parameters");
     }
   }
 }

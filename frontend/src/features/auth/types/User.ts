@@ -1,11 +1,11 @@
-import z from 'zod';
+import z from "zod";
 
 export interface User {
   user_id: number;
   email: string;
   first_name: string;
   last_name: string;
-  status: 'Active';
+  status: "Active";
 }
 
 export const UserSchema = z.object({
@@ -13,5 +13,5 @@ export const UserSchema = z.object({
   email: z.email(),
   first_name: z.string().nonempty(),
   last_name: z.string().nonempty(),
-  status: z.literal(['Active'], { error: 'User status is not active' }),
+  status: z.literal(["Active"], { error: "User status is not active" }),
 }) satisfies z.ZodType<User>;

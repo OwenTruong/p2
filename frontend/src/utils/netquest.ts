@@ -1,13 +1,13 @@
-import { StatusError } from '@/errors/StatusError';
-import { logger, mode } from './utils';
+import { StatusError } from "@/errors/StatusError";
+import { logger, mode } from "./utils";
 
-const fileLogger = logger.ns('netquest').seal();
+const fileLogger = logger.ns("netquest").seal();
 
 export const eventNames = {
-  BAD_REQUEST: 'netquest:badRequest',
-  UNAUTHORIZED: 'netquest:unauthorized',
-  FORBIDDEN: 'netquest:forbidden',
-  DEFAULT: 'netquest:default',
+  BAD_REQUEST: "netquest:badRequest",
+  UNAUTHORIZED: "netquest:unauthorized",
+  FORBIDDEN: "netquest:forbidden",
+  DEFAULT: "netquest:default",
 } as const;
 
 export type NetquestEventName = (typeof eventNames)[keyof typeof eventNames];
@@ -31,7 +31,7 @@ function dispatchBadStatus(detail: NetquestErrorDetail) {
   );
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export type RequestOptions = {
   params?: Record<string, string>;
@@ -44,12 +44,12 @@ export type RequestOptions = {
 
 /** Buffers the body for logging only. Never let this break a request. */
 async function safeBodyPreview(res: Response): Promise<string> {
-  if (mode === 'production') return '(not logged in production)';
+  if (mode === "production") return "(not logged in production)";
   try {
     const text = await res.clone().text();
-    return text || '(empty)';
+    return text || "(empty)";
   } catch {
-    return '(unreadable)';
+    return "(unreadable)";
   }
 }
 
@@ -71,9 +71,9 @@ async function request(
   try {
     res = await fetch(fullURL, {
       method,
-      credentials: 'include',
+      credentials: "include",
       headers: {
-        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(body ? { "Content-Type": "application/json" } : {}),
         ...(headers ?? {}),
       },
       body: body ? JSON.stringify(body) : undefined,
@@ -102,16 +102,16 @@ async function request(
   return res;
 }
 
-function get(url: string, options?: Omit<RequestOptions, 'body'>) {
-  return request('GET', url, options);
+function get(url: string, options?: Omit<RequestOptions, "body">) {
+  return request("GET", url, options);
 }
 
 function post(url: string, options?: RequestOptions) {
-  return request('POST', url, options);
+  return request("POST", url, options);
 }
 
 function put(url: string, options?: RequestOptions) {
-  return request('PUT', url, options);
+  return request("PUT", url, options);
 }
 
 export default { get, post, put };

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useUser } from '@/features/auth/userContext';
+import { useUser } from "@/features/auth/userContext";
 // import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
-import type { RegisterDTO } from '../types/RegisterDTO';
+import type { RegisterDTO } from "../types/RegisterDTO";
 
 // const registerLogger = logger.ns('page', 'Register').seal();
 
@@ -13,11 +13,11 @@ export default function Page() {
   const { userAuth, register } = useUser();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,16 +26,16 @@ export default function Page() {
   useEffect(() => {
     if (!pending.current) return;
 
-    if (userAuth.status === 'authenticated') {
+    if (userAuth.status === "authenticated") {
       pending.current = false;
       setSubmitting(false);
-      navigate('/', { replace: true });
-    } else if (userAuth.status === 'unauthenticated') {
+      navigate("/", { replace: true });
+    } else if (userAuth.status === "unauthenticated") {
       pending.current = false;
       setSubmitting(false);
       setFormError(
         userAuth.error?.message ??
-          'Unable to create account. Please try again.',
+          "Unable to create account. Please try again.",
       );
     }
   }, [userAuth, navigate]);
@@ -45,7 +45,7 @@ export default function Page() {
     if (submitting) return;
 
     if (password !== confirmPassword) {
-      setFormError('The two passwords do not match.');
+      setFormError("The two passwords do not match.");
       return;
     }
 
@@ -61,7 +61,7 @@ export default function Page() {
     };
 
     await register(registerDTO);
-    navigate('/login', { replace: true });
+    navigate("/login", { replace: true });
   }
 
   const mismatch = confirmPassword.length > 0 && password !== confirmPassword;
@@ -141,7 +141,7 @@ export default function Page() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               aria-invalid={mismatch || undefined}
-              aria-describedby={mismatch ? 'password-mismatch' : undefined}
+              aria-describedby={mismatch ? "password-mismatch" : undefined}
               required
             />
             {mismatch && (
@@ -151,7 +151,7 @@ export default function Page() {
 
           <div>
             <button type="submit" disabled={submitting || mismatch}>
-              {submitting ? 'Creating account…' : 'Create account'}
+              {submitting ? "Creating account…" : "Create account"}
             </button>
           </div>
         </form>

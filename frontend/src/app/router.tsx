@@ -1,11 +1,11 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter } from "react-router-dom";
 
-import AccountPage from '../features/account/pages/AccountPage';
-import HomePage from '../features/home/pages/HomePage';
-import MyListingsPage from '../features/listings/pages/MyListingsPage';
-import LoginPage from '../features/auth/pages/LoginPage';
-import RegisterPage from '../features/auth/pages/RegisterPage';
-import AppLayout from '../layouts/AppLayout';
+import AccountPage from "../features/account/pages/AccountPage";
+import HomePage from "../features/home/pages/HomePage";
+import MyListingsPage from "../features/listings/pages/MyListingsPage";
+import LoginPage from "../features/auth/pages/LoginPage";
+import RegisterPage from "../features/auth/pages/RegisterPage";
+import AppLayout from "../layouts/AppLayout";
 
 function CreateListingPage() {
   return <h1>Create Listing (Coming Soon)</h1>;
@@ -20,43 +20,43 @@ export const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       {
-        path: '/',
+        path: "/",
         element: <HomePage />,
       },
       {
-        path: '/account',
+        path: "/account",
         element: <AccountPage />,
       },
       {
-        path: '/my-listings',
+        path: "/my-listings",
         element: <MyListingsPage />,
       },
       {
-        path: '/my-listings/create',
+        path: "/my-listings/create",
         element: <CreateListingPage />,
       },
       {
-        path: '/my-listings/:listingId',
+        path: "/my-listings/:listingId",
         element: <ListingDetailsPage />,
       },
       {
-        path: '/reservations',
+        path: "/reservations",
         element: <h1>My Reservations (Coming Soon)</h1>,
       },
       {
-        path: '/settings',
+        path: "/settings",
         element: <h1>My Profile (Coming Soon)</h1>,
       },
       {
-        path: '/login',
+        path: "/login",
         element: <LoginPage />,
       },
       {
-        path: '/register',
+        path: "/register",
         element: <RegisterPage />,
       },
       {
-        path: '/logout',
+        path: "/logout",
         element: <h1>Logout (Coming Soon)</h1>,
       },
     ],
