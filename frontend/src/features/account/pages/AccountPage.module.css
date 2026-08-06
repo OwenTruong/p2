@@ -1,0 +1,74 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 3rem 1rem;
+    background: #f5f7fa;
+  }
+  
+  .accountCard {
+    width: 100%;
+    max-width: 640px;
+    padding: 2rem;
+    border: 1px solid #e1e5ea;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e8ebef;
+  }
+  
+  .header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+  
+  .header p {
+    margin: 0.35rem 0 0;
+    color: #667085;
+  }
+  
+  .avatar {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #1f2937;
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  .accountDetails {
+    margin-top: 1.5rem;
+  }
+  
+  .field {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #edf0f2;
+  }
+  
+  .field:last-child {
+    border-bottom: none;
+  }
+  
+  .label {
+    color: #667085;
+    font-weight: 600;
+  }
+  
+  .value {
+    color: #1f2937;
+  }
