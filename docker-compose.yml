@@ -1,4 +1,4 @@
-# NOTE: 
+# NOTE:
 # THIS COMPOSE FILE IS ONLY MEANT FOR DEVELOPMENT. PRODUCTION WILL BE USING KUBERNETES.
 # Production database will be on Azure Database for PostgreSQL
 
@@ -6,6 +6,10 @@ x-common-api-environment: &common-api-environment
   AUTH_SERVICE_URL: http://auth_service:8000
   LISTING_SERVICE_URL: http://listing_service:8000
   RESERVATION_SERVICE_URL: http://reservation_service:8000
+  VITE_AUTH_SERVICE_URL: ${VITE_AUTH_SERVICE_URL}
+  VITE_LISTING_SERVICE_URL: ${VITE_LISTING_SERVICE_URL}
+  VITE_RESERVATION_SERVICE_URL: ${VITE_RESERVATION_SERVICE_URL}
+  VITE_SAMPLE_SERVICE_URL: ${VITE_SAMPLE_SERVICE_URL}
 
 x-common-db-environment: &common-db-environment
   DB_HOST: ${DB_HOST}
@@ -13,6 +17,9 @@ x-common-db-environment: &common-db-environment
   DB_USER: ${DB_USER}
   DB_PASSWORD: ${DB_PASSWORD}
   PASSWORD_SALT: ${PASSWORD_SALT}
+
+x-common-backend-environment: &common-backend-environment
+  CORS_ORIGIN_URL: ${CORS_ORIGIN_URL}
 
 services:
   # Development services will be added here.
@@ -25,7 +32,7 @@ services:
     ports:
       - '${FRONTEND_PORT:-8000}:80'
     environment:
-      <<: 
+      <<:
         - *common-api-environment
 
   auth_service:
@@ -37,9 +44,10 @@ services:
     ports:
       - '${AUTH_PORT:-8001}:8000'
     environment:
-      <<: 
+      <<:
         - *common-db-environment
         - *common-api-environment
+        - *common-backend-environment
       DB_NAME: ${AUTH_DB_NAME}
     depends_on:
       auth_migrate:
@@ -54,9 +62,10 @@ services:
     ports:
       - '${SAMPLE_PORT:-8001}:8000'
     environment:
-      <<: 
+      <<:
         - *common-db-environment
         - *common-api-environment
+        - *common-backend-environment
       DB_NAME: ${SAMPLE_DB_NAME}
     depends_on:
       postgresql:
@@ -66,16 +75,16 @@ services:
     build:
       context: .
       dockerfile: services/auth_service/Dockerfile
-    command: ["python", "-m", "app.migrate"]
+    command: ['python', '-m', 'app.migrate']
     env_file: '.env'
     environment:
-      <<: 
+      <<:
         - *common-db-environment
       DB_NAME: ${AUTH_DB_NAME}
     depends_on:
       postgresql:
         condition: service_healthy
-    restart: "no"
+    restart: 'no'
 
   postgresql:
     image: postgres:15-alpine
@@ -87,7 +96,7 @@ services:
       retries: 5
     env_file: '.env'
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - '${DB_PORT:-5432}:5432'
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

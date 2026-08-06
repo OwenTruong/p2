@@ -1,3 +1,4 @@
+import { StatusError } from '@/errors/StatusError';
 import { UnexpectedError } from '@/errors/UnexpectedError';
 import netquest from '@/utils/netquest';
 
@@ -21,20 +22,24 @@ export async function logoutUser(url: string): Promise<void> {
         mainLogger.warn(
           `Unexpected ${response.status} level status code returned by server`,
         );
-      } else {
-        mainLogger.error(`Unexpected error code returned by server.`);
-        mainLogger.debug(`Error code is ${response.status}`);
-        throw new UnexpectedError(
-          `Unexpected response status (${response.status}) during login`,
-        );
       }
     }
     mainLogger.success('Successfully logged out user.');
   } catch (error) {
-    mainLogger.error('Failed to log out user.');
-    mainLogger.verbose(`Error: ${String(error)}`);
-    throw new UnexpectedError(
-      `An unexpected error occurred while trying to logout: ${String(error)}`,
-    );
+    if (error instanceof StatusError) {
+      mainLogger.error(`Unexpected error code returned by server.`);
+      mainLogger.debug(`Error code is ${error.code}`);
+      throw new UnexpectedError(
+        `Unexpected response status (${error.code}) during login`,
+      );
+    } else if (error instanceof UnexpectedError) {
+      throw error;
+    } else {
+      mainLogger.error('Failed to log out user.');
+      mainLogger.verbose(error);
+      throw new UnexpectedError(
+        `An unexpected error occurred while trying to logout: ${String(error)}`,
+      );
+    }
   }
 }

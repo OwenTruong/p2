@@ -15,19 +15,14 @@ import { logoutUser } from './api/logoutUser';
 import { UnexpectedError } from '@/errors/UnexpectedError';
 import { eventNames } from '@/utils/netquest';
 
-import {
-  LOGIN_URL,
-  LOGOUT_URL,
-  FETCH_USER_URL,
-  REGISTER_URL,
-} from '@/utils/constants';
+import { config } from '@/utils/config';
 import type { RegisterDTO } from './types/RegisterDTO';
 import { registerUser } from './api/registerUser';
 import type { LoginDTO } from './types/LoginDTO';
 
 const fileLogger = logger.ns('userContext').seal();
 const providerLogger = fileLogger.ns('provider').seal();
-const useUserLogger = fileLogger.ns('useUser').seal();
+// const useUserLogger = fileLogger.ns('useUser').seal();
 
 const UserContext = createContext<{
   userAuth: UserAuth;
@@ -54,7 +49,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
    */
   const logout = useCallback(async () => {
     try {
-      await logoutUser(LOGOUT_URL);
+      await logoutUser(config.logoutPath);
       setUserAuth({
         currentUser: null,
         status: 'unauthenticated',
@@ -86,8 +81,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
    */
   const login = useCallback(async (loginDTO: LoginDTO) => {
     try {
-      await loginUser(LOGIN_URL, loginDTO);
-      const user = await fetchUser(FETCH_USER_URL);
+      await loginUser(config.loginPath, loginDTO);
+      const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
         currentUser: user,
         status: 'authenticated',
@@ -122,8 +117,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
    */
   const register = useCallback(async (registerDTO: RegisterDTO) => {
     try {
-      await registerUser(REGISTER_URL, registerDTO);
-      const user = await fetchUser(FETCH_USER_URL);
+      providerLogger.ns('register').info('Now registering');
+      await registerUser(config.registerPath, registerDTO);
+      providerLogger.ns('register').info('NOw fetching user');
+      const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
         currentUser: user,
         status: 'authenticated',
@@ -146,7 +143,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const user = await fetchUser(FETCH_USER_URL);
+        const user = await fetchUser(config.fetchUserPath);
         if (!cancelled)
           setUserAuth({
             currentUser: user,

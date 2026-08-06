@@ -8,6 +8,7 @@ import { UserNotSignedInError } from '../errors/UserNotSignedInError';
 
 import { type User, UserSchema } from '../types/User';
 import { UserNotFoundError } from '../errors/UserNotFoundError';
+import { StatusError } from '@/errors/StatusError';
 
 const fileLogger = logger.ns('auth').seal();
 const mainLogger = fileLogger.ns('fetchUser').seal();
@@ -26,25 +27,7 @@ export async function fetchUser(url: string): Promise<User> {
     const userResponse = await netquest.get(url, { skipErrorEvent: true });
     if (userResponse.status != 200) {
       mainLogger.fail('User fetching failed.');
-      if (userResponse.status === 404) {
-        mainLogger.warn(
-          'User not found. If user has not logged in before yet, this function should not be called.',
-        );
-        throw new UserNotFoundError();
-      } else if (userResponse.status === 401) {
-        mainLogger.warn(
-          'User is not signed in. This function should not be called.',
-        );
-        throw new UserNotSignedInError();
-      } else if (userResponse.status === 400) {
-        mainLogger.info('An invalid email was provided.');
-        throw new UnexpectedError('Bad request when fetching email');
-      } else if (userResponse.status >= 500) {
-        mainLogger.error(`Server error. Unable to fetch user.`);
-        throw new UnexpectedError(
-          `Server error (${userResponse.status}) when fetching email`,
-        );
-      } else if (!(userResponse.status >= 200 && userResponse.status < 300)) {
+      if (!(userResponse.status >= 200 && userResponse.status < 300)) {
         mainLogger.error(`Unexpected error code returned by server.`);
         mainLogger.debug(`Error code is ${userResponse.status}`);
         throw new UnexpectedError(
@@ -64,6 +47,29 @@ export async function fetchUser(url: string): Promise<User> {
       throw new UnexpectedError('Invalid user format received from server');
     }
   } catch (error) {
+    if (error instanceof StatusError) {
+      const status = Number(error.code);
+      mainLogger.debug(`Registration rejected with ${status}`);
+      if (status === 404) {
+        mainLogger.warn(
+          'User not found. If user has not logged in before yet, this function should not be called.',
+        );
+        throw new UserNotFoundError();
+      } else if (status === 401) {
+        mainLogger.warn(
+          'User is not signed in. This function should not be called.',
+        );
+        throw new UserNotSignedInError();
+      } else if (status === 400) {
+        mainLogger.info('An invalid email was provided.');
+        throw new UnexpectedError('Bad request when fetching email');
+      } else if (status >= 500) {
+        mainLogger.error(`Server error. Unable to fetch user.`);
+        throw new UnexpectedError(
+          `Server error (${status}) when fetching email`,
+        );
+      }
+    }
     if (
       error instanceof UserNotFoundError ||
       error instanceof UserNotSignedInError ||
@@ -72,7 +78,7 @@ export async function fetchUser(url: string): Promise<User> {
       throw error;
     } else {
       mainLogger.error('Failed to fetch user successfully.');
-      mainLogger.verbose(`Error: ${String(error)}`);
+      mainLogger.verbose(error);
       throw new UnexpectedError(
         `An unexpected error occurred while fetching email: ${String(error)}`,
       );

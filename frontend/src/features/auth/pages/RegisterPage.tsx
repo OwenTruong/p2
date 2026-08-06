@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useUser } from '@/features/auth/userContext';
-import styles from './Auth.module.css';
+// import styles from './Auth.module.css';
 
-import { logger } from '@/utils/utils';
+// import { logger } from '@/utils/utils';
 import type { RegisterDTO } from '../types/RegisterDTO';
 
-const registerLogger = logger.ns('page', 'Register').seal();
+// const registerLogger = logger.ns('page', 'Register').seal();
 
 export default function Page() {
   const { userAuth, register } = useUser();

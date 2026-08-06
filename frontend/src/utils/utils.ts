@@ -15,7 +15,7 @@ function getMode(): 'development' | 'production' | 'preview' {
 export const mode = getMode();
 
 setup({
-  activeLevel: mode === 'development' ? 'verbose' : 'info',
+  activeLevel: mode === 'production' ? 'info' : 'verbose',
 });
 
 export const logger = adze.withEmoji.timestamp.seal();

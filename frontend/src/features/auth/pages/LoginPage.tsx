@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useUser } from '@/features/auth/userContext';
 
-import { logger } from '@/utils/utils';
+// import { logger } from '@/utils/utils';
 import type { LoginDTO } from '../types/LoginDTO';
 
-const loginLogger = logger.ns('page', 'Login').seal();
+// const loginLogger = logger.ns('page', 'Login').seal();
 
 export default function Page() {
   const { userAuth, login } = useUser();
