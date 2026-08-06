@@ -5,12 +5,9 @@ function joinPaths(path1: string, path2: string) {
 
 const authServiceUrl: string =
   import.meta.env.VITE_AUTH_SERVICE_URL ?? 'http://10.0.0.1:8080';
-const listingServiceUrl: string =
-  import.meta.env.VITE_LISTING_SERVICE_URL ?? 'http://10.0.0.1:8080';
-const reservationServiceUrl: string =
-  import.meta.env.VITE_RESERVATION_SERVICE_URL ?? 'http://10.0.0.1:8080';
-const sampleServiceUrl: string =
-  import.meta.env.VITE_SAMPLE_SERVICE_URL ?? 'http://10.0.0.1:8080';
+// const listingServiceUrl: string = import.meta.env.VITE_LISTING_SERVICE_URL ?? 'http://10.0.0.1:8080';
+// const reservationServiceUrl: string = import.meta.env.VITE_RESERVATION_SERVICE_URL ?? 'http://10.0.0.1:8080';
+// const sampleServiceUrl: string = import.meta.env.VITE_SAMPLE_SERVICE_URL ?? 'http://10.0.0.1:8080';
 
 export const loginPath = joinPaths(authServiceUrl, '/api/auth/login');
 export const logoutPath = joinPaths(authServiceUrl, '/api/auth/logout');

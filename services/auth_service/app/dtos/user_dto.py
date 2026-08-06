@@ -25,7 +25,7 @@ class UserCreateRequestDTO(BaseModel):
       return value
 
 
-  class UserResponseDTO(BaseModel):
+class UserResponseDTO(BaseModel):
     user_id: int
     email: EmailStr
     first_name: str
