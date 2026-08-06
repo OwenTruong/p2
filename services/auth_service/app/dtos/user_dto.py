@@ -13,7 +13,7 @@ class UserCreateRequestDTO(BaseModel):
   @classmethod
   def normalize_email(cls, value: str) -> str:
       return value.strip().lower()
-  
+
   @field_validator("first_name", "last_name")
   @classmethod
   def validate_name(cls, value: str) -> str:
@@ -23,3 +23,11 @@ class UserCreateRequestDTO(BaseModel):
           raise ValueError("Name must contain at least one letter")
 
       return value
+
+
+  class UserResponseDTO(BaseModel):
+    user_id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    status: str
