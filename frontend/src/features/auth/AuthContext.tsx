@@ -5,37 +5,36 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { fetchUser } from "./api/fetchUser";
+} from 'react';
+import { fetchUser } from './api/fetchUser';
 
-import { type UserAuth } from "./types/UserAuth";
-import { logger } from "@/utils/utils";
-import { loginUser } from "./api/loginUser";
-import { logoutUser } from "./api/logoutUser";
-import { UnexpectedError } from "@/errors/UnexpectedError";
-import { eventNames } from "@/utils/netquest";
+import { type UserAuth } from './types/UserAuth';
+import { logger } from '@/utils/utils';
+import { loginUser } from './api/loginUser';
+import { logoutUser } from './api/logoutUser';
+import { UnexpectedError } from '@/errors/UnexpectedError';
+import { eventNames } from '@/utils/netquest';
 
-import { config } from "@/utils/config";
-import type { RegisterDTO } from "./types/RegisterDTO";
-import { registerUser } from "./api/registerUser";
-import type { LoginDTO } from "./types/LoginDTO";
+import { config } from '@/utils/config';
+import type { RegisterDTO } from './types/RegisterDTO';
+import { registerUser } from './api/registerUser';
+import type { LoginDTO } from './types/LoginDTO';
 
-const fileLogger = logger.ns("userContext").seal();
-const providerLogger = fileLogger.ns("provider").seal();
-// const useUserLogger = fileLogger.ns('useUser').seal();
+const fileLogger = logger.ns('userContext').seal();
+const providerLogger = fileLogger.ns('provider').seal();
 
-const UserContext = createContext<{
+const AuthContext = createContext<{
   userAuth: UserAuth;
   logout: () => Promise<void>;
   login: (loginDTO: LoginDTO) => Promise<void>;
   register: (registerDTO: RegisterDTO) => Promise<void>;
 } | null>(null);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userAuth, setUserAuth] = useState<UserAuth>(() => {
     return {
       currentUser: null,
-      status: "loading",
+      status: 'loading',
       error: null,
     };
   });
@@ -52,14 +51,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       await logoutUser(config.logoutPath);
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error: null,
       });
     } catch (err) {
       providerLogger.warn(`Unable to logout: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error: null,
       });
     }
@@ -83,21 +82,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       setUserAuth({
         currentUser: null,
-        status: "loading",
+        status: 'loading',
         error: null,
       });
       await loginUser(config.loginPath, loginDTO);
       const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
         currentUser: user,
-        status: "authenticated",
+        status: 'authenticated',
         error: null,
       });
     } catch (err) {
       providerLogger.warn(`Unable to login: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error:
           err instanceof Error
             ? err
@@ -122,24 +121,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
    */
   const register = useCallback(async (registerDTO: RegisterDTO) => {
     try {
-      providerLogger.ns("register").info("Now registering");
+      providerLogger.ns('register').info('Now registering');
       setUserAuth({
         currentUser: null,
-        status: "loading",
+        status: 'loading',
         error: null,
       });
       await registerUser(config.registerPath, registerDTO);
-      providerLogger.ns("register").info("NOw fetching user");
+      providerLogger.ns('register').info('NOw fetching user');
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error: null,
       });
     } catch (err) {
       providerLogger.warn(`Unable to register: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error:
           err instanceof Error
             ? err
@@ -156,7 +155,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled)
           setUserAuth({
             currentUser: user,
-            status: "authenticated",
+            status: 'authenticated',
             error: null,
           });
       } catch (err) {
@@ -164,7 +163,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           providerLogger.warn(`Unable to fetch user on load: ${err}`);
           setUserAuth({
             currentUser: null,
-            status: "unauthenticated",
+            status: 'unauthenticated',
             error: null,
           });
         }
@@ -179,7 +178,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const onUnauthorized = () => {
       setUserAuth({
         currentUser: null,
-        status: "unauthenticated",
+        status: 'unauthenticated',
         error: null,
       });
     };
@@ -198,12 +197,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     [userAuth, login, logout, register],
   );
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useUser() {
-  const ctx = useContext(UserContext);
+export function useAuth() {
+  const ctx = useContext(AuthContext);
   if (!ctx)
-    throw new UnexpectedError("useUser must be used within a UserProvider.");
+    throw new UnexpectedError('useAuth must be used within an AuthProvider.');
   return ctx;
 }

@@ -1,23 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { useUser } from "@/features/auth/userContext";
-// import styles from './Auth.module.css';
+import { useAuth } from '@/features/auth/AuthContext';
+
+import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
-import type { RegisterDTO } from "../types/RegisterDTO";
+import type { RegisterDTO } from '../types/RegisterDTO';
 
 // const registerLogger = logger.ns('page', 'Register').seal();
 
 export default function Page() {
-  const { userAuth, register } = useUser();
+  const { userAuth, register } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,16 +27,16 @@ export default function Page() {
   useEffect(() => {
     if (!pending.current) return;
 
-    if (userAuth.status === "authenticated") {
+    if (userAuth.status === 'authenticated') {
       pending.current = false;
       setSubmitting(false);
-      navigate("/", { replace: true });
-    } else if (userAuth.status === "unauthenticated") {
+      navigate('/', { replace: true });
+    } else if (userAuth.status === 'unauthenticated') {
       pending.current = false;
       setSubmitting(false);
       setFormError(
         userAuth.error?.message ??
-          "Unable to create account. Please try again.",
+          'Unable to create account. Please try again.',
       );
     }
   }, [userAuth, navigate]);
@@ -45,7 +46,7 @@ export default function Page() {
     if (submitting) return;
 
     if (password !== confirmPassword) {
-      setFormError("The two passwords do not match.");
+      setFormError('The two passwords do not match.');
       return;
     }
 
@@ -61,102 +62,132 @@ export default function Page() {
     };
 
     await register(registerDTO);
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   }
 
   const mismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
   return (
-    <main>
-      <section>
-        <h2>Register</h2>
+    <main className={styles.page}>
+      <section className={styles.panel}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Create account</h2>
+          <p className={styles.lede}>
+            One account to list a space of your own or book someone
+            else&rsquo;s.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} noValidate>
-          {formError && <p role="alert">{formError}</p>}
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {formError && (
+            <p className={styles.alert} role="alert">
+              {formError}
+            </p>
+          )}
 
-          <div>
-            <label htmlFor="first-name">First name</label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="first-name">
+              First name
+            </label>
             <input
+              className={styles.input}
               id="first-name"
               name="firstName"
               type="text"
               autoComplete="given-name"
-              placeholder="First name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
             />
           </div>
 
-          <div>
-            <label htmlFor="last-name">Last name</label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="last-name">
+              Last name
+            </label>
             <input
+              className={styles.input}
               id="last-name"
               name="lastName"
               type="text"
               autoComplete="family-name"
-              placeholder="Last name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
             />
           </div>
 
-          <div>
-            <label htmlFor="email">Email</label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="email">
+              Email
+            </label>
             <input
+              className={styles.input}
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          <div>
-            <label htmlFor="password">Password</label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="password">
+              Password
+            </label>
             <input
+              className={styles.input}
               id="password"
               name="password"
               type="password"
               autoComplete="new-password"
-              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          <div>
-            <label htmlFor="confirm-password">Confirm password</label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="confirm-password">
+              Confirm password
+            </label>
             <input
+              className={styles.input}
               id="confirm-password"
               name="confirmPassword"
               type="password"
               autoComplete="new-password"
-              placeholder="Confirm password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               aria-invalid={mismatch || undefined}
-              aria-describedby={mismatch ? "password-mismatch" : undefined}
+              aria-describedby={mismatch ? 'password-mismatch' : undefined}
               required
             />
             {mismatch && (
-              <p id="password-mismatch">The two passwords do not match.</p>
+              <p className={styles.fieldError} id="password-mismatch">
+                The two passwords do not match.
+              </p>
             )}
           </div>
 
-          <div>
-            <button type="submit" disabled={submitting || mismatch}>
-              {submitting ? "Creating account…" : "Create account"}
+          <div className={styles.actions}>
+            <button
+              className={styles.submit}
+              type="submit"
+              disabled={submitting || mismatch}
+            >
+              {submitting ? 'Creating account…' : 'Create account'}
             </button>
           </div>
         </form>
 
-        <Link to="/login">Already have an account?</Link>
+        <div className={styles.footer}>
+          <Link className={styles.altLink} to="/login">
+            Already have an account?
+          </Link>
+        </div>
       </section>
     </main>
   );
