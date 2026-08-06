@@ -43,7 +43,8 @@ export async function loginUser(
   } catch (error) {
     if (error instanceof StatusError) {
       const status = Number(error.code);
-      if (status === 400 || status === 422) {
+      // FIXME: For some reason, our architecture and backend is returning 401 for invalid email/password
+      if (status === 401 || status === 422) {
         mainLogger.warn('Invalid credentials provided.');
         throw new UserLoginCredentialsError();
       } else if (status === 409) {

@@ -1,7 +1,7 @@
 import adze, { setup } from 'adze';
 
 function getMode(): 'development' | 'production' | 'preview' {
-  const mode = import.meta.env.MODE;
+  const mode = import.meta.env.VITE_MODE;
 
   if (mode === 'development' || mode === 'production' || mode === 'preview') {
     return mode;
@@ -19,3 +19,5 @@ setup({
 });
 
 export const logger = adze.withEmoji.timestamp.seal();
+
+logger.info(`Mode is set to ${mode}`);

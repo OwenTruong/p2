@@ -8,6 +8,7 @@ x-common-api-environment: &common-api-environment
   RESERVATION_SERVICE_URL: http://reservation_service:8000
 
 x-common-vite-environment: &common-vite-environment
+  VITE_MODE: ${VITE_MODE}
   VITE_AUTH_SERVICE_URL: ${VITE_AUTH_SERVICE_URL}
   VITE_LISTING_SERVICE_URL: ${VITE_LISTING_SERVICE_URL}
   VITE_RESERVATION_SERVICE_URL: ${VITE_RESERVATION_SERVICE_URL}
