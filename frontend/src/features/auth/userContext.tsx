@@ -81,6 +81,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
    */
   const login = useCallback(async (loginDTO: LoginDTO) => {
     try {
+      setUserAuth({
+        currentUser: null,
+        status: 'loading',
+        error: null,
+      });
       await loginUser(config.loginPath, loginDTO);
       const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
@@ -118,12 +123,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (registerDTO: RegisterDTO) => {
     try {
       providerLogger.ns('register').info('Now registering');
+      setUserAuth({
+        currentUser: null,
+        status: 'loading',
+        error: null,
+      });
       await registerUser(config.registerPath, registerDTO);
       providerLogger.ns('register').info('NOw fetching user');
-      const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
-        currentUser: user,
-        status: 'authenticated',
+        currentUser: null,
+        status: 'unauthenticated',
         error: null,
       });
     } catch (err) {

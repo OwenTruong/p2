@@ -44,7 +44,7 @@ export async function fetchUser(url: string): Promise<User> {
     } else {
       // devLog('Invalid user format received from server:', userResult);
       mainLogger.error(`Invalid user format received from server.`);
-      mainLogger.debug(`userResult: ${userResult}`);
+      mainLogger.debug('userResult: ', userResult);
       throw new UnexpectedError('Invalid user format received from server');
     }
   } catch (error) {

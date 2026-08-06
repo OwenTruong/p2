@@ -61,6 +61,7 @@ export default function Page() {
     };
 
     await register(registerDTO);
+    navigate('/login', { replace: true });
   }
 
   const mismatch = confirmPassword.length > 0 && password !== confirmPassword;

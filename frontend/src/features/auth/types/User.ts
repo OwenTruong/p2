@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export interface User {
-  id: string;
+  user_id: number;
   email: string;
   first_name: string;
   last_name: string;
@@ -9,7 +9,7 @@ export interface User {
 }
 
 export const UserSchema = z.object({
-  id: z.string().nonempty(),
+  user_id: z.number(),
   email: z.email(),
   first_name: z.string().nonempty(),
   last_name: z.string().nonempty(),
