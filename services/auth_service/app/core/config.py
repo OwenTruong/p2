@@ -23,7 +23,7 @@ __config = Config(
   jwt_expiration = int(os.getenv("JWT_EXPIRATION", 15))
 )
 
-logging.debug(f"""Config Loaded:
+logging.info(f"""Config Loaded:
   db_host: {__config.db_host}
   db_name: {__config.db_name}
   db_user: {__config.db_user}

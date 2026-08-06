@@ -24,6 +24,7 @@ export async function loginUser(
   loginDTO: LoginDTO,
 ): Promise<void> {
   try {
+    mainLogger.info(`Now sending a loginUser request to ${url}`);
     const response = await netquest.post(url, {
       body: {
         ...loginDTO,

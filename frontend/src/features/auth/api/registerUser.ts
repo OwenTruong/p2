@@ -22,6 +22,7 @@ export async function registerUser(
   registerDTO: RegisterDTO,
 ): Promise<void> {
   try {
+    mainLogger.info(`Now sending a registerUser request to ${url}`);
     const response = await netquest.post(url, {
       body: {
         ...registerDTO,

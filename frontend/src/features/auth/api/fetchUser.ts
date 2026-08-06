@@ -24,6 +24,7 @@ const mainLogger = fileLogger.ns('fetchUser').seal();
  */
 export async function fetchUser(url: string): Promise<User> {
   try {
+    mainLogger.info(`Now sending a fetchUser request to ${url}`);
     const userResponse = await netquest.get(url, { skipErrorEvent: true });
     if (userResponse.status != 200) {
       mainLogger.fail('User fetching failed.');

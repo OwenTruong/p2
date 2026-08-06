@@ -1,3 +1,7 @@
+import { logger } from './utils';
+
+const fileLogger = logger.ns('config').seal();
+
 function joinPaths(path1: string, path2: string) {
   // Handles trailing slashes
   return `${path1.replace(/\/$/, '')}/${path2.replace(/^\//, '')}`;
@@ -20,3 +24,5 @@ export const config = {
   registerPath,
   fetchUserPath,
 };
+
+fileLogger.info(config);

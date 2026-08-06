@@ -15,6 +15,7 @@ const mainLogger = fileLogger.ns('loginUser').seal();
  */
 export async function logoutUser(url: string): Promise<void> {
   try {
+    mainLogger.info(`Now sending a logoutUser request to ${url}`);
     const response = await netquest.post(url, { skipErrorEvent: true });
     if (response.status != 200) {
       mainLogger.fail('User logout failed.');
