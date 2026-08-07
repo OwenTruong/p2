@@ -1,5 +1,15 @@
 /* src/components/Navbar/Navbar.module.css */
 
+.logout {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
 .header {
     border-bottom: 1px solid #d9d9d9;
     background-color: #ffffff;
@@ -28,6 +38,7 @@
     gap: 24px;
 }
 
+
 .link {
     color: #555555;
     text-decoration: none;
@@ -36,6 +47,12 @@
 
 .link:hover {
     color: #111111;
+}
+
+.link:focus-visible {
+    outline: 2px solid #111111;
+    outline-offset: 4px;
+    border-radius: 2px;
 }
 
 .activeLink {

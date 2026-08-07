@@ -15,6 +15,7 @@ __config = Config(
   db_port = int(os.getenv("DB_PORT", 1000)),
 
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
+  cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
   password_salt = os.getenv("PASSWORD_SALT", "MySaltyPassword1234"),
   
   jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS"),
@@ -22,7 +23,8 @@ __config = Config(
   jwt_expiration = int(os.getenv("JWT_EXPIRATION", 15))
 )
 
-logging.debug(f"""Config Loaded:
+# using logging does not work here as it has not been initialized in main.py yet
+print(f"""Config Loaded:
   db_host: {__config.db_host}
   db_name: {__config.db_name}
   db_user: {__config.db_user}
@@ -30,6 +32,7 @@ logging.debug(f"""Config Loaded:
   db_port: {__config.db_port}
 
   mode: {__config.mode}
+  cors_origin_url: {__config.cors_origin_url}
   password_salt: REDACTED
   
   jwt_algorithm: {__config.jwt_algorithm}

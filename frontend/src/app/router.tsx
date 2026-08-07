@@ -1,8 +1,10 @@
-import AccountPage from "../features/account/pages/AccountPage";
 import { createBrowserRouter } from "react-router-dom";
 
+import AccountPage from "../features/account/pages/AccountPage";
 import HomePage from "../features/home/pages/HomePage";
 import MyListingsPage from "../features/listings/pages/MyListingsPage";
+import LoginPage from "../features/auth/pages/LoginPage";
+import RegisterPage from "../features/auth/pages/RegisterPage";
 import AppLayout from "../layouts/AppLayout";
 
 function CreateListingPage() {
@@ -47,7 +49,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <h1>Login (Coming Soon)</h1>,
+        element: <LoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
       },
       {
         path: "/logout",

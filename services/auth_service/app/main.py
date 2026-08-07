@@ -4,6 +4,7 @@ import logging
 import hashlib
 
 from fastapi import FastAPI, Request, HTTPException, status, Response
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # First Party
@@ -29,6 +30,16 @@ logging.basicConfig(
 user_repository = UserRepository()
 
 app = FastAPI(title="Auth Service")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        config.cors_origin_url
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth.router)
 app.include_router(users.router)
