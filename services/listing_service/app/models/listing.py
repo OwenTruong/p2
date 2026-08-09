@@ -11,4 +11,8 @@ class Listing(BaseModel):
     max_guests: int = Field(ge=1, examples=[4])
     bedrooms: int = Field(ge=0, examples=[2])
     bathrooms: int = Field(ge=0, examples=[1])
-    status: Literal["Available", "Unavailable"] = Field(default="Available", examples=["Available"])
+    is_published: bool = True
+    address: str
+    city: str
+    state: str
+    zip_code: str
