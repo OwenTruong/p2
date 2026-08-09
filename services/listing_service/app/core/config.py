@@ -15,6 +15,7 @@ __config = Config(
   db_port = int(os.getenv("DB_PORT", 1000)),
 
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
+  cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
 )
 
 print(f"""Config Loaded:
@@ -25,6 +26,7 @@ print(f"""Config Loaded:
   db_port: {__config.db_port}
 
   mode: {__config.mode}
+  cors_origin_url: {__config.cors_origin_url}
 """)
 
 
