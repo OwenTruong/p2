@@ -10,10 +10,10 @@ listing_service = ListingService()
 @router.post("", response_model=ListingResponseDTO, status_code=status.HTTP_201_CREATED)
 def create_listing(
     dto: ListingCreateRequestDTO,
-    current_user: AuthenticatedUser = Depends(get_current_user)
+    # current_user: AuthenticatedUser = Depends(get_current_user)
 ):
     created_listing = listing_service.create_listing(
-        host_id=current_user.user_id, 
+        host_id=1, 
         dto=dto
     )
     

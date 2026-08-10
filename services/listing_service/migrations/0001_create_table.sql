@@ -1,20 +1,27 @@
 -- Create listings table and related enum
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'listing_status') THEN
-    CREATE TYPE listing_status AS ENUM ('Available', 'Unavailable');
-  END IF;
-END $$;
-
 CREATE TABLE IF NOT EXISTS listings (
-  listing_id BIGSERIAL PRIMARY KEY,
-  host_id BIGINT NOT NULL REFERENCES users(user_id),
-  title VARCHAR(128) NOT NULL,
-  description VARCHAR(1024) NOT NULL,
-  location VARCHAR(256) NOT NULL,
-  price_per_night NUMERIC(10, 2) NOT NULL,
-  max_guests INT NOT NULL,
-  bedrooms INT NOT NULL,
-  bathrooms INT NOT NULL,
-  status listing_status NOT NULL DEFAULT 'Available'
+    listing_id BIGSERIAL PRIMARY KEY,
+    host_id BIGINT NOT NULL,
+
+    title VARCHAR(128) NOT NULL,
+    description VARCHAR(1024) NOT NULL,
+
+    price_per_night NUMERIC(10, 2) NOT NULL
+        CHECK (price_per_night >= 0),
+
+    max_guests INT NOT NULL
+        CHECK (max_guests > 0),
+
+    bedrooms INT NOT NULL
+        CHECK (bedrooms >= 0),
+
+    bathrooms INT NOT NULL
+        CHECK (bathrooms >= 0),
+
+    is_published BOOLEAN NOT NULL DEFAULT FALSE,
+
+    address VARCHAR(128) NOT NULL,
+    city VARCHAR(64) NOT NULL,
+    state CHAR(2) NOT NULL,
+    zip_code VARCHAR(16) NOT NULL
 );
