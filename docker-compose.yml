@@ -59,6 +59,24 @@ services:
       auth_migrate:
         condition: service_completed_successfully
 
+  listing_service:
+    build:
+      context: .
+      dockerfile: services/listing_service/Dockerfile
+    container_name: listing-server
+    env_file: '.env'
+    ports:
+      - '${LISTING_PORT:-8002}:8000'
+    environment:
+      <<:
+        - *common-db-environment
+        - *common-api-environment
+        - *common-backend-environment
+      DB_NAME: ${LISTING_DB_NAME}
+    depends_on:
+      listing_migrate:
+        condition: service_completed_successfully
+
   sample_service:
     build:
       context: .
@@ -87,6 +105,21 @@ services:
       <<:
         - *common-db-environment
       DB_NAME: ${AUTH_DB_NAME}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: 'no'
+
+  listing_migrate:
+    build:
+      context: .
+      dockerfile: services/listing_service/Dockerfile
+    command: ['python', '-m', 'app.migrate']
+    env_file: '.env'
+    environment:
+      <<:
+        - *common-db-environment
+      DB_NAME: ${LISTING_DB_NAME}
     depends_on:
       postgresql:
         condition: service_healthy

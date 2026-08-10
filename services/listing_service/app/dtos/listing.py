@@ -1,10 +1,17 @@
-from pydantic import BaseModel, Field, field_validator
+from decimal import Decimal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 import re
 
 class ListingCreateRequestDTO(BaseModel):
     title: str = Field(..., min_length=1, max_length=256, examples=["Downtown Apartment"])
     description: str = Field(default=None, max_length=512, examples=["Two-bedroom apartment near downtown."])
-    price_per_night: float = Field(..., gt=0, decimal_places=2, examples=["125.00"])
+    price_per_night: Decimal = Field(
+        gt=0,
+        max_digits=10,
+        decimal_places=2,
+        examples=[Decimal("125.00")],
+    )
     max_guests: int = Field(..., gt=0, examples=[4])
     bedrooms: int = Field(..., gt=0, examples=[2])
     bathrooms: int = Field(..., gt=0, examples=[1])
@@ -30,11 +37,13 @@ class ListingCreateRequestDTO(BaseModel):
         return v_clean
 
 class ListingResponseDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     listing_id: int
     host_id: int
     title: str
     description: str | None
-    price_per_night: float
+    price_per_night: Decimal
     max_guests: int
     bedrooms: int
     bathrooms: int
