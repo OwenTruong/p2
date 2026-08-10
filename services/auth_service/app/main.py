@@ -4,8 +4,12 @@ import logging
 import hashlib
 
 from fastapi import FastAPI, Request, HTTPException, status, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from shared.exceptions.exception_handlers import register_exception_handlers
 
 # First Party
 from .core.config import get_config
@@ -30,6 +34,8 @@ logging.basicConfig(
 user_repository = UserRepository()
 
 app = FastAPI(title="Auth Service")
+
+register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,

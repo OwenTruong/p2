@@ -1,12 +1,10 @@
-from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Response, status
 from app.dtos.auth import LoginRequest, AuthSuccessResponse
-from app.dtos.user_dto import UserCreateRequestDTO
-from app.repositories.user_repository import UserRepository
+from app.dtos.user_dto import UserCreateRequestDTO, UserResponseDTO
 from app.services.auth_service import AuthService
 from app.core.config import get_config
 
 from app.api.dependencies import get_current_user
-from shared.utils.exceptions import UniqueRowException
 
 config = get_config()
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -18,12 +16,8 @@ def get_auth_service() -> AuthService:
 def register(
     dto: UserCreateRequestDTO,
     auth_service: AuthService = Depends(get_auth_service)
-):
-    try:
-        saved_user = auth_service.save_user(dto)
-        return {"status": "success", "detail": f"Account for user `{saved_user.email}` has been provisioned"}
-    except UniqueRowException:
-        raise HTTPException(status_code=409, detail="User with this email already exists")
+) -> UserResponseDTO:
+    return auth_service.save_user(dto)
 
 @router.post("/login", response_model=AuthSuccessResponse, status_code=status.HTTP_200_OK)
 def login(
