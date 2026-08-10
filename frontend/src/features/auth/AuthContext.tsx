@@ -128,7 +128,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         error: null,
       });
       await registerUser(config.registerPath, registerDTO);
-      providerLogger.ns('register').info('NOw fetching user');
       setUserAuth({
         currentUser: null,
         status: 'unauthenticated',

@@ -10,4 +10,10 @@ class NoFetchedResultException(Exception):
   """Raised when a fetchone query returns nothing."""
 
 class UniqueRowException(Exception):
-  """Raised when a row insertion fails due to unique constraint"""
+  """Raised when a row insertion fails due to unique constraint."""
+
+class ActiveReservationException(Exception):
+  """Raised when attempting to delete a listing that has an active reservation going on."""
+
+class UserDoesNotOwnException(Exception):
+  """Raised when a user tries to access a record/row they do not own."""
