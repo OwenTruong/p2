@@ -6,11 +6,8 @@ import type { RegisterDTO, RegisterResponseDTO } from "../types/RegisterDTO";
 import axios from "axios";
 import { RegistrationError } from "../errors/RegistrationError";
 import type { ApiErrorResponse } from "@/errors/ApiError";
+import { getAxios } from "@/utils/axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:8010/api",
-  withCredentials: true,
-});
 // const fileLogger = logger.ns("auth").seal();
 // const mainLogger = fileLogger.ns("registerUser").seal();
 
@@ -25,11 +22,10 @@ export async function registerUser(
   registerDTO: RegisterDTO,
 ): Promise<RegisterResponseDTO> {
 
-  console.log(url)
 
   try {
-    const response = await api.post<RegisterResponseDTO>(
-      "/auth/register",
+    const response = await getAxios().post<RegisterResponseDTO>(
+      url,
       registerDTO,
     );
     return response.data;
