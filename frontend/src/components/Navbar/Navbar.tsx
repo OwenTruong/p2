@@ -1,10 +1,11 @@
 // src/components/Navbar/Navbar.jsx
 
-import { NavLink, type NavLinkRenderProps } from 'react-router-dom';
+import { NavLink, useNavigate, type NavLinkRenderProps } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { useAuth } from '@/features/auth/AuthContext';
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const auth = useAuth();
   const getLinkClass = ({ isActive }: NavLinkRenderProps) =>
     isActive ? `${styles.link} ${styles.activeLink}` : styles.link;
@@ -45,7 +46,10 @@ export default function Navbar() {
           {auth.userAuth.status === 'authenticated' && (
             <button
               type="button"
-              onClick={async () => await auth.logout()}
+              onClick={async () => {
+                await auth.logout();
+                navigate("/", {replace: true});
+              }}
               className={`${styles.link} ${styles.logout}`}
             >
               Logout

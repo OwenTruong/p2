@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/features/auth/AuthContext';
@@ -7,52 +7,65 @@ import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
 import type { LoginDTO } from '../types/LoginDTO';
+import { LoginError } from '../errors/LoginError';
+// import { email } from 'zod';
 
 // const loginLogger = logger.ns('page', 'Login').seal();
+type FieldErrors = {
+  email?: string;
+  password?: string;
+};
 
 export default function Page() {
-  const { userAuth, login } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  const pending = useRef(false);
+  async function handleSubmit(e: React.FormEvent) {
+      e.preventDefault();
 
-  useEffect(() => {
-    if (!pending.current) return;
+      if (submitting) return;
 
-    if (userAuth.status === 'authenticated') {
-      pending.current = false;
-      setSubmitting(false);
-      navigate('/', { replace: true });
-    } else if (userAuth.status === 'unauthenticated') {
-      pending.current = false;
-      setSubmitting(false);
-      setFormError(
-        userAuth.error?.message ?? 'Unable to sign in. Please try again.',
-      );
-    }
-  }, [userAuth, navigate]);
+      const loginDTO: LoginDTO = {
+        email,
+        password
+      }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (submitting) return;
+      const validationErrors = validateLogin(loginDTO);
 
-    setFormError(null);
-    setSubmitting(true);
-    pending.current = true;
+      if (Object.keys(validationErrors).length > 0) {
+        setFieldErrors(validationErrors);
+        return;
+      }
 
-    const loginDTO: LoginDTO = {
-      email,
-      password,
-    };
+      setFieldErrors({});
+      setFormErrors(null);
+      setSubmitting(true);
 
-    await login(loginDTO);
+      try {
+          await login(loginDTO);
+
+          navigate('/', { replace: true });
+      } catch(error) {
+
+          if (error instanceof LoginError) {
+            const errorMessages: string[] = error.errors.map(e => e.message);
+            setFormErrors(errorMessages ?? ["Unable to sign in."]);
+          } else {
+            setFormErrors([
+                'Unable to sign in. Please try again.',
+            ]);
+          }
+
+      } finally {
+          setSubmitting(false);
+      }
   }
-
   return (
     <main className={styles.page}>
       <section className={styles.panel}>
@@ -64,9 +77,9 @@ export default function Page() {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          {formError && (
+          {formErrors && (
             <p className={styles.alert} role="alert">
-              {formError}
+              {formErrors}
             </p>
           )}
 
@@ -82,8 +95,16 @@ export default function Page() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={!!fieldErrors.email || undefined}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
               required
             />
+
+            {fieldErrors.email && (
+              <p className={styles.fieldError} id="email-error">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>
@@ -95,11 +116,21 @@ export default function Page() {
               id="password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength={8}
+              maxLength={128}
+              aria-invalid={!!fieldErrors.password || undefined}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
               required
             />
+
+            {fieldErrors.password && (
+              <p className={styles.fieldError} id="password-error">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
 
           <div className={styles.actions}>
@@ -121,4 +152,25 @@ export default function Page() {
       </section>
     </main>
   );
+}
+
+function validateLogin(input : LoginDTO): FieldErrors {
+
+  const errors: FieldErrors = {};
+  const email = input.email;
+  const password = input.password;
+
+  if (!email) {
+    errors.email = 'Email is required.';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Enter a valid email address.';
+  }
+
+  if (password.length < 8) {
+    errors.password = 'Password must be at least 8 characters.';
+  } else if (password.length > 128) {
+    errors.password = 'Password must be at most 128 characters.';
+  }
+
+  return errors;
 }

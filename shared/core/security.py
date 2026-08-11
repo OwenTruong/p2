@@ -1,7 +1,9 @@
 import jwt
-from fastapi import HTTPException, status
+from fastapi import status
 from shared.dtos.auth_user import AuthenticatedUser
 from shared.core.config import get_shared_config
+from shared.dtos.errors import ApiErrorDTO
+from shared.exceptions.exceptions import ApiException
 
 def verify_jwt_token(token: str) -> AuthenticatedUser:
     """
@@ -10,30 +12,19 @@ def verify_jwt_token(token: str) -> AuthenticatedUser:
     """
     config = get_shared_config()
     try:
-        payload = jwt.decode(token, config.jwt_secret_key, algorithms=[config.jwt_algorithm])
+        return jwt.decode(token, config.jwt_secret_key, algorithms=[config.jwt_algorithm])
         
-        user_id_raw = payload.get("sub")
-        if not user_id_raw:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token payload: missing subject",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-            
-        return AuthenticatedUser(
-            user_id=int(user_id_raw),
-            email=payload.get("email")
-        )
-
     except jwt.ExpiredSignatureError:
-        raise HTTPException(
+        raise ApiException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
+            errors=[
+                ApiErrorDTO(message="Token has expired")
+            ]
         )
     except (jwt.PyJWTError, ValueError):
-        raise HTTPException(
+        raise ApiException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or modified token",
-            headers={"WWW-Authenticate": "Bearer"},
+            errors=[
+                ApiErrorDTO(message="Invalid or modified token")
+            ]
         )
