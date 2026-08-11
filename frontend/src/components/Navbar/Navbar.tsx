@@ -22,19 +22,6 @@ export default function Navbar() {
             Home
           </NavLink>
 
-          {/* PROTECTED ROUTES */}
-          <NavLink to="/my-listings" className={getLinkClass}>
-            My Listings
-          </NavLink>
-
-          <NavLink to="/reservations" className={getLinkClass}>
-            My Reservations
-          </NavLink>
-
-          <NavLink to="/settings" className={getLinkClass}>
-            My Profile
-          </NavLink>
-
           {/* DISPLAY ONLY FOR NON-AUTHENTICATED USERS */}
           {auth.userAuth.status != 'authenticated' && (
             <NavLink to="/login" className={getLinkClass}>
@@ -44,6 +31,20 @@ export default function Navbar() {
 
           {/* DISPLAY ONLY FOR AUTHENTICATED USERS */}
           {auth.userAuth.status === 'authenticated' && (
+            <>
+            {/* PROTECTED ROUTES */}
+            <NavLink to="/my-listings" className={getLinkClass}>
+              My Listings
+            </NavLink>
+
+            <NavLink to="/reservations" className={getLinkClass}>
+              My Reservations
+            </NavLink>
+
+            <NavLink to="/settings" className={getLinkClass}>
+              My Profile
+            </NavLink>
+            
             <button
               type="button"
               onClick={async () => {
@@ -54,6 +55,7 @@ export default function Navbar() {
             >
               Logout
             </button>
+            </>
           )}
         </div>
       </nav>
