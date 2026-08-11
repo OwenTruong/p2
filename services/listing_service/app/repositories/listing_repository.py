@@ -28,7 +28,7 @@ class ListingRepository(DBRepository):
             ]
         )
 
-    def get_listings_by_host_id(self, host_id: int) -> list[Listing]:
+    def find_all_by_host_id(self, host_id: int) -> list[Listing]:
         query = f"""
             SELECT *
             FROM {self._table_name}

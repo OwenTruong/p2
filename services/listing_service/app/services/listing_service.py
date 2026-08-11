@@ -24,4 +24,4 @@ class ListingService:
         return self.listing_repo.save(listing)
 
     def get_all_by_host_id(self, host_id: int) -> list[Listing]:
-        return self.listing_repo.get_listings_by_host_id(host_id)
+        return self.listing_repo.find_all_by_host_id(host_id)
