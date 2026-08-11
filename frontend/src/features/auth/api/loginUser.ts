@@ -4,10 +4,10 @@
 // import { logger } from "@/utils/utils";
 // import { UserLoginCredentialsError } from "../errors/UserLoginCredentialsError";
 // import { UserDeactivatedError } from "../errors/UserDeactivatedError";
+import { LoginError } from "../errors/LoginError";
 import type { LoginDTO } from "../types/LoginDTO";
 // import { StatusError } from "@/errors/StatusError";
 import axios from "axios";
-import { LoginError } from "../types/RegistrationError";
 
 // const fileLogger = logger.ns("auth").seal();
 // const mainLogger = fileLogger.ns("loginUser").seal();
@@ -42,9 +42,11 @@ export async function loginUser(
     return response.data
 
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const apiErrors = error.response?.data.errors;
-      throw new LoginError(apiErrors ?? []);
+    if (axios.isAxiosError(error) && error.response) {
+      throw new LoginError(
+        error.response.status,
+        error.response.data
+      );
     }
   }
 }

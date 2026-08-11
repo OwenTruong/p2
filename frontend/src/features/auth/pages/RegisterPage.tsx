@@ -7,7 +7,7 @@ import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
 import type { RegisterDTO } from '../types/RegisterDTO';
-import { RegistrationError } from '../types/RegistrationError';
+import { RegistrationError } from '../errors/RegistrationError';
 
 // const registerLogger = logger.ns('page', 'Register').seal();
 type FieldErrors = {
