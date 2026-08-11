@@ -22,3 +22,6 @@ class ListingService:
             zip_code=dto.zip_code
         )
         return self.listing_repo.save(listing)
+
+    def get_all_by_host_id(self, host_id: int) -> list[Listing]:
+        return self.listing_repo.find_all_by_host_id(host_id)

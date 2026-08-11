@@ -3,9 +3,9 @@
 
 // import { logger } from "@/utils/utils";
 import type { RegisterDTO, RegisterResponseDTO } from "../types/RegisterDTO";
-// import { RegistrationError, type ApiErrorResponse } from "../types/RegistrationError";
 import axios from "axios";
-import { RegistrationError, type ApiErrorResponse } from "../types/RegistrationError";
+import { RegistrationError } from "../errors/RegistrationError";
+import type { ApiErrorResponse } from "@/errors/ApiError";
 
 const api = axios.create({
   baseURL: "http://localhost:8010/api",
@@ -35,9 +35,11 @@ export async function registerUser(
     return response.data;
 
   } catch (error) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-          const apiErrors = error.response?.data.errors;
-          throw new RegistrationError(apiErrors ?? []);
+      if (axios.isAxiosError<ApiErrorResponse>(error) && error.response) {
+          throw new RegistrationError(
+            error.response.status,
+            error.response.data
+          );
       }
 
       throw error;

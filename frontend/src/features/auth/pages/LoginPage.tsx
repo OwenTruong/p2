@@ -7,6 +7,7 @@ import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
 import type { LoginDTO } from '../types/LoginDTO';
+import { LoginError } from '../errors/LoginError';
 // import { email } from 'zod';
 
 // const loginLogger = logger.ns('page', 'Login').seal();
@@ -21,7 +22,7 @@ export default function Page() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [formError, setFormError] = useState<string[] | null>(null);
+  const [formErrors, setFormErrors] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
@@ -43,17 +44,24 @@ export default function Page() {
       }
 
       setFieldErrors({});
-      setFormError(null);
+      setFormErrors(null);
       setSubmitting(true);
 
       try {
           await login(loginDTO);
 
           navigate('/', { replace: true });
-      } catch {
-          setFormError([
-              'Unable to sign in. Please try again.',
-          ]);
+      } catch(error) {
+
+          if (error instanceof LoginError) {
+            const errorMessages: string[] = error.errors.map(e => e.message);
+            setFormErrors(errorMessages ?? ["Unable to sign in."]);
+          } else {
+            setFormErrors([
+                'Unable to sign in. Please try again.',
+            ]);
+          }
+
       } finally {
           setSubmitting(false);
       }
@@ -69,9 +77,9 @@ export default function Page() {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          {formError && (
+          {formErrors && (
             <p className={styles.alert} role="alert">
-              {formError}
+              {formErrors}
             </p>
           )}
 

@@ -23,8 +23,6 @@ class EmailAlreadyExistsException(ApiException):
         super().__init__(
             409, 
             [
-                ApiErrorDTO(
-                    message="User with this email already exists."
-                )
+                ApiErrorDTO(message="User with this email already exists.")
             ]
         )    

@@ -5,6 +5,8 @@ import logging
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from shared.exceptions.exception_handlers import register_exception_handlers
+
 # First Party
 from .core.config import get_config
 from app.api.controllers import listings
@@ -20,6 +22,8 @@ logging.basicConfig(
 )
 
 app = FastAPI(title="Listing Service")
+
+register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
