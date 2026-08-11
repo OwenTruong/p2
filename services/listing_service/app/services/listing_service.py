@@ -1,6 +1,7 @@
 from app.repositories.listing_repository import ListingRepository
 from app.dtos.listing import ListingCreateRequestDTO
 from app.models.listing import Listing
+from app.models.listingFilter import FilterParams
 
 class ListingService:
     def __init__(self, listing_repo: ListingRepository | None = None):
@@ -22,3 +23,6 @@ class ListingService:
             zip_code=dto.zip_code
         )
         return self.listing_repo.save(listing)
+
+    def find_all(self, query: FilterParams):
+        return self.listing_repo.find_all(query)
