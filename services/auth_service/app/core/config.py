@@ -15,7 +15,7 @@ __config = Config(
   db_port = int(os.getenv("DB_PORT", 1000)),
 
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
-  cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
+  cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:5000"),
   password_salt = os.getenv("PASSWORD_SALT", "MySaltyPassword1234"),
   
   jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS"),

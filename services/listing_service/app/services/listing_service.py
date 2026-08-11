@@ -48,3 +48,5 @@ class ListingService:
         else:
             raise NoFetchedResultException()
         
+    def get_all_by_host_id(self, host_id: int) -> list[Listing]:
+        return self.listing_repo.find_all_by_host_id(host_id)

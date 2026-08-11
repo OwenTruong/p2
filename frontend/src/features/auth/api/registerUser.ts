@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { UnexpectedError } from '@/errors/UnexpectedError';
 import netquest from '@/utils/netquest';
 
@@ -8,18 +9,34 @@ import { StatusError } from '@/errors/StatusError';
 
 const fileLogger = logger.ns('auth').seal();
 const mainLogger = fileLogger.ns('registerUser').seal();
+=======
+// import { UnexpectedError } from "@/errors/UnexpectedError";
+// import netquest from "@/utils/netquest";
+
+// import { logger } from "@/utils/utils";
+import type { RegisterDTO, RegisterResponseDTO } from "../types/RegisterDTO";
+import axios from "axios";
+import { RegistrationError } from "../errors/RegistrationError";
+import type { ApiErrorResponse } from "@/errors/ApiError";
+
+const api = axios.create({
+  baseURL: "http://localhost:8010/api",
+  withCredentials: true,
+});
+// const fileLogger = logger.ns("auth").seal();
+// const mainLogger = fileLogger.ns("registerUser").seal();
+>>>>>>> origin/master
 
 /**
  *
  * @param {string} url
  * @param {RegisterDTO} registerDTO
- *
- * @throws {UserLoginCredentialsError}
- * @throws {UnexpectedError}
+ * 
  */
 export async function registerUser(
   url: string,
   registerDTO: RegisterDTO,
+<<<<<<< HEAD
 ): Promise<void> {
   try {
     mainLogger.info(`Now sending a registerUser request to ${url}`);
@@ -50,12 +67,29 @@ export async function registerUser(
         throw new UnexpectedError(
           `Unexpected response status (${status}) during login`,
         );
+=======
+): Promise<RegisterResponseDTO> {
+
+  console.log(url)
+
+  try {
+    const response = await api.post<RegisterResponseDTO>(
+      "/auth/register",
+      registerDTO,
+    );
+    return response.data;
+
+  } catch (error) {
+      if (axios.isAxiosError<ApiErrorResponse>(error) && error.response) {
+          throw new RegistrationError(
+            error.response.status,
+            error.response.data
+          );
+>>>>>>> origin/master
       }
-    } else if (
-      error instanceof UserLoginCredentialsError ||
-      error instanceof UnexpectedError
-    ) {
+
       throw error;
+<<<<<<< HEAD
     } else {
       mainLogger.error('Failed to register user.');
       mainLogger.verbose(error);
@@ -63,5 +97,9 @@ export async function registerUser(
         `An unexpected error occurred while trying to register: ${String(error)}`,
       );
     }
+=======
+>>>>>>> origin/master
   }
+
+
 }

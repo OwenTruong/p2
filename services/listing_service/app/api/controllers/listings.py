@@ -11,10 +11,10 @@ listing_service = ListingService()
 @router.post("", response_model=ListingResponseDTO, status_code=status.HTTP_201_CREATED)
 def create_listing(
     dto: ListingCreateRequestDTO,
-    # current_user: AuthenticatedUser = Depends(get_current_user)
+    auth_user: AuthenticatedUser = Depends(get_current_user)
 ):
     created_listing = listing_service.create_listing(
-        host_id=1, 
+        host_id=auth_user.user_id, 
         dto=dto
     )
     
@@ -51,3 +51,8 @@ def delete_listing(
                 }
             ]
         })
+@router.get("/me", status_code=status.HTTP_200_OK)
+def get_my_listings(
+    auth_user : AuthenticatedUser = Depends(get_current_user)
+):
+    return listing_service.get_all_by_host_id(auth_user.user_id)

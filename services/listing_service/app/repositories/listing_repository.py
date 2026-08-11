@@ -58,3 +58,16 @@ class ListingRepository(DBRepository):
             return self._execute_fetch_one(query, Listing, values=[id])
         except NoFetchedResultException:
             return None
+
+    def find_all_by_host_id(self, host_id: int) -> list[Listing]:
+        query = f"""
+            SELECT *
+            FROM {self._table_name}
+            WHERE host_id=%s
+            ORDER BY listing_id;
+        """
+        return self._execute_fetch_all(
+            query,
+            Listing,
+            values=[host_id],
+        )
