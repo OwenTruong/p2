@@ -5,7 +5,6 @@ import { type User, UserSchema } from "./User";
 export interface UserAuth {
   currentUser: User | null;
   status: "authenticated" | "unauthenticated" | "loading";
-  error: Error | null;
 }
 
 export const UserAuthSchema = z.object({

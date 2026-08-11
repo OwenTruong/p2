@@ -7,8 +7,16 @@ import styles from './Auth.module.css';
 
 // import { logger } from '@/utils/utils';
 import type { RegisterDTO } from '../types/RegisterDTO';
+import { RegistrationError } from '../types/RegistrationError';
 
 // const registerLogger = logger.ns('page', 'Register').seal();
+type FieldErrors = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+};
 
 export default function Page() {
   const { userAuth, register } = useAuth();
@@ -19,9 +27,10 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  
   const pending = useRef(false);
 
   useEffect(() => {
@@ -34,38 +43,53 @@ export default function Page() {
     } else if (userAuth.status === 'unauthenticated') {
       pending.current = false;
       setSubmitting(false);
-      setFormError(
-        userAuth.error?.message ??
-          'Unable to create account. Please try again.',
-      );
+      setFormError(['Registration failed. Please check your input and try again.']);
     }
   }, [userAuth, navigate]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
 
-    if (password !== confirmPassword) {
-      setFormError('The two passwords do not match.');
+    const errors = validateRegistration({
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
+    setFieldErrors({});
     setFormError(null);
     setSubmitting(true);
-    pending.current = true;
 
     const registerDTO: RegisterDTO = {
-      email,
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+      email: email.trim().toLowerCase(),
       password,
-      first_name: firstName,
-      last_name: lastName,
     };
 
-    await register(registerDTO);
-    navigate('/login', { replace: true });
+    try {
+      await register(registerDTO);
+      navigate('/login', { replace: true });
+    } catch (error) {
+      setFormError(
+        error instanceof RegistrationError
+          ? error.errors.map((err) => err.message)
+          : ['An unexpected error occurred. Please try again later.']
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  const mismatch = confirmPassword.length > 0 && password !== confirmPassword;
+  // const mismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
   return (
     <main className={styles.page}>
@@ -81,7 +105,11 @@ export default function Page() {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           {formError && (
             <p className={styles.alert} role="alert">
-              {formError}
+              <ul>
+                {formError.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
             </p>
           )}
 
@@ -89,6 +117,7 @@ export default function Page() {
             <label className={styles.label} htmlFor="first-name">
               First name
             </label>
+
             <input
               className={styles.input}
               id="first-name"
@@ -97,14 +126,25 @@ export default function Page() {
               autoComplete="given-name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              minLength={2}
+              maxLength={64}
+              aria-invalid={!!fieldErrors.first_name || undefined}
+              aria-describedby={fieldErrors.first_name ? 'first-name-error' : undefined}
               required
             />
+
+            {fieldErrors.first_name && (
+              <p className={styles.fieldError} id="first-name-error">
+                {fieldErrors.first_name}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="last-name">
               Last name
             </label>
+
             <input
               className={styles.input}
               id="last-name"
@@ -113,14 +153,25 @@ export default function Page() {
               autoComplete="family-name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              minLength={2}
+              maxLength={64}
+              aria-invalid={!!fieldErrors.last_name || undefined}
+              aria-describedby={fieldErrors.last_name ? 'last-name-error' : undefined}
               required
             />
+
+            {fieldErrors.last_name && (
+              <p className={styles.fieldError} id="last-name-error">
+                {fieldErrors.last_name}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="email">
               Email
             </label>
+
             <input
               className={styles.input}
               id="email"
@@ -129,14 +180,23 @@ export default function Page() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={!!fieldErrors.email || undefined}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
               required
             />
+
+            {fieldErrors.email && (
+              <p className={styles.fieldError} id="email-error">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="password">
               Password
             </label>
+
             <input
               className={styles.input}
               id="password"
@@ -145,14 +205,25 @@ export default function Page() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength={8}
+              maxLength={128}
+              aria-invalid={!!fieldErrors.password || undefined}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
               required
             />
+
+            {fieldErrors.password && (
+              <p className={styles.fieldError} id="password-error">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="confirm-password">
               Confirm password
             </label>
+
             <input
               className={styles.input}
               id="confirm-password"
@@ -161,13 +232,18 @@ export default function Page() {
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              aria-invalid={mismatch || undefined}
-              aria-describedby={mismatch ? 'password-mismatch' : undefined}
+              minLength={8}
+              maxLength={128}
+              aria-invalid={!!fieldErrors.confirmPassword || undefined}
+              aria-describedby={
+                fieldErrors.confirmPassword ? 'confirm-password-error' : undefined
+              }
               required
             />
-            {mismatch && (
-              <p className={styles.fieldError} id="password-mismatch">
-                The two passwords do not match.
+
+            {fieldErrors.confirmPassword && (
+              <p className={styles.fieldError} id="confirm-password-error">
+                {fieldErrors.confirmPassword}
               </p>
             )}
           </div>
@@ -176,7 +252,8 @@ export default function Page() {
             <button
               className={styles.submit}
               type="submit"
-              disabled={submitting || mismatch}
+              // disabled={submitting || mismatch}
+              disabled={submitting}
             >
               {submitting ? 'Creating account…' : 'Create account'}
             </button>
@@ -191,4 +268,53 @@ export default function Page() {
       </section>
     </main>
   );
+}
+
+
+function validateRegistration(input: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}): FieldErrors {
+  const errors: FieldErrors = {};
+
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
+  const email = input.email.trim().toLowerCase();
+
+  if (firstName.length < 2) {
+    errors.first_name = 'First name must be at least 2 characters.';
+  } else if (firstName.length > 64) {
+    errors.first_name = 'First name must be less than 64 characters.';
+  } else if (![...firstName].some((char) => /\p{L}/u.test(char))) {
+    errors.first_name = 'First name must contain at least one letter.';
+  }
+
+  if (lastName.length < 2) {
+    errors.last_name = 'Last name must be at least 2 characters.';
+  } else if (lastName.length > 64) {
+    errors.last_name = 'Last name must be less than 64 characters.';
+  } else if (![...lastName].some((char) => /\p{L}/u.test(char))) {
+    errors.last_name = 'Last name must contain at least one letter.';
+  }
+
+  if (!email) {
+    errors.email = 'Email is required.';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Enter a valid email address.';
+  }
+
+  if (input.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters.';
+  } else if (input.password.length > 128) {
+    errors.password = 'Password must be at most 128 characters.';
+  }
+
+  if (input.password !== input.confirmPassword) {
+    errors.confirmPassword = 'The two passwords do not match.';
+  }
+
+  return errors;
 }

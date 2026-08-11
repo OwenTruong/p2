@@ -7,6 +7,13 @@ export interface RegisterDTO {
   last_name: string;
 }
 
+export interface RegisterResponseDTO {
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  status: string;
+}
 export const RegisterDTOSchema = z.object({
   email: z.email(),
   password: z.string().nonempty(),
