@@ -8,6 +8,7 @@ import styles from './Auth.module.css';
 // import { logger } from '@/utils/utils';
 import type { LoginDTO } from '../types/LoginDTO';
 import { LoginError } from '../errors/LoginError';
+import { isDev } from '@/utils/utils';
 // import { email } from 'zod';
 
 // const loginLogger = logger.ns('page', 'Login').seal();
@@ -66,9 +67,50 @@ export default function Page() {
           setSubmitting(false);
       }
   }
+
+  async function handleAdminLogin() {
+    try {
+      await login({
+        email: "admin@gmail.com",
+        password: "password123"
+      });
+      navigate('/', { replace: true });
+
+    } catch(error) {
+
+      if (error instanceof LoginError) {
+        const errorMessages: string[] = error.errors.map(e => e.message);
+        setFormErrors(errorMessages ?? ["Unable to sign in."]);
+      } else {
+        setFormErrors([
+            'Unable to sign in. Please try again.',
+        ]);
+      }
+
+    } finally {
+        setSubmitting(false);
+    }
+  }
+
   return (
     <main className={styles.page}>
       <section className={styles.panel}>
+
+        {/* DEV ONLY */}
+        {isDev && (
+          <div className={styles.devTools}>
+            <span className={styles.devLabel}>Development</span>
+            <button
+              className={styles.adminLogin}
+              type="button"
+              disabled={submitting}
+              onClick={handleAdminLogin}
+            >
+              Login as Admin
+            </button>
+          </div>
+        )}
+
         <div className={styles.header}>
           <h2 className={styles.title}>Sign in</h2>
           <p className={styles.lede}>

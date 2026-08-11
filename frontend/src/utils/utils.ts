@@ -13,6 +13,9 @@ function getMode(): "development" | "production" | "preview" {
 }
 
 export const mode = getMode();
+export const isDev = getMode() === "development";
+export const isPreview = getMode() === "preview";
+export const isProd = getMode() === "production";
 
 setup({
   activeLevel: mode === "production" ? "info" : "verbose",
