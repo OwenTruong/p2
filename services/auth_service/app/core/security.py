@@ -24,10 +24,3 @@ def create_access_token(user_id: int, email: str) -> str:
         "exp": expire
     }
     return jwt.encode(payload, config.jwt_secret_key, algorithm=config.jwt_algorithm)
-
-def decode_access_token(token: str) -> dict | None:
-    try:
-        return jwt.decode(token, config.jwt_secret_key, algorithms=[config.jwt_algorithm])
-    except jwt.PyJWTError as e:
-        print(f"JWT decode error: {e}")
-        return None

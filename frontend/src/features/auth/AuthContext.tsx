@@ -6,7 +6,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { fetchUser } from './api/fetchUser';
 
 import { type UserAuth } from './types/UserAuth';
 import { logger } from '@/utils/utils';
@@ -19,6 +18,7 @@ import { config } from '@/utils/config';
 import type { RegisterDTO } from './types/RegisterDTO';
 import { registerUser } from './api/registerUser';
 import type { LoginDTO } from './types/LoginDTO';
+import { fetchUser } from './api/fetchUser';
 
 const fileLogger = logger.ns('userContext').seal();
 const providerLogger = fileLogger.ns('provider').seal();
@@ -31,11 +31,11 @@ const AuthContext = createContext<{
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+
   const [userAuth, setUserAuth] = useState<UserAuth>(() => {
     return {
       currentUser: null,
-      status: 'loading',
-      error: null,
+      status: 'loading'
     };
   });
 
@@ -51,15 +51,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await logoutUser(config.logoutPath);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated',
-        error: null,
+        status: 'unauthenticated'
       });
     } catch (err) {
       providerLogger.warn(`Unable to logout: ${err}`);
+      
+      // This is functionally similar to a successful logout
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated',
-        error: null,
+        status: 'unauthenticated'
       });
     }
   }, []);
@@ -82,26 +82,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setUserAuth({
         currentUser: null,
-        status: 'loading',
-        error: null,
+        status: 'loading'
       });
       await loginUser(config.loginPath, loginDTO);
       const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
         currentUser: user,
-        status: 'authenticated',
-        error: null,
+        status: 'authenticated'
       });
     } catch (err) {
       providerLogger.warn(`Unable to login: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated',
-        error:
-          err instanceof Error
-            ? err
-            : new UnexpectedError(`Unknown error occurred.`),
+        status: 'unauthenticated'
       });
+
+      throw err
     }
   }, []);
 
@@ -124,26 +120,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       providerLogger.ns('register').info('Now registering');
       setUserAuth({
         currentUser: null,
-        status: 'loading',
-        error: null,
+        status: 'loading'
       });
       await registerUser(config.registerPath, registerDTO);
-      providerLogger.ns('register').info('NOw fetching user');
-      setUserAuth({
-        currentUser: null,
-        status: 'unauthenticated',
-        error: null,
-      });
+
     } catch (err) {
       providerLogger.warn(`Unable to register: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated',
-        error:
-          err instanceof Error
-            ? err
-            : new UnexpectedError(`Unknown error occurred.`),
+        status: 'unauthenticated'
       });
+
+      throw err
     }
   }, []);
 
@@ -155,16 +143,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled)
           setUserAuth({
             currentUser: user,
-            status: 'authenticated',
-            error: null,
+            status: 'authenticated'
           });
       } catch (err) {
         if (!cancelled) {
           providerLogger.warn(`Unable to fetch user on load: ${err}`);
           setUserAuth({
             currentUser: null,
-            status: 'unauthenticated',
-            error: null,
+            status: 'unauthenticated'
           });
         }
       }
@@ -178,8 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const onUnauthorized = () => {
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated',
-        error: null,
+        status: 'unauthenticated'
       });
     };
     window.addEventListener(eventNames.UNAUTHORIZED, onUnauthorized);
