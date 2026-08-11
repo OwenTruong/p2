@@ -21,3 +21,23 @@ def get_current_user(
         )
 
     return verify_jwt_token(token=credentials.credentials)
+
+def get_optional_current_user(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security_bearer)]) -> AuthenticatedUser | None:
+    """
+    Optional authentication dependency.
+    Returns the authenticated user when valid credentials are provided.
+    Returns None when no credentials are provided.
+    Rejects invalid credentials.
+    """
+    if not credentials:
+        return None
+
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid Bearer authentication header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return verify_jwt_token(token=credentials.credentials)

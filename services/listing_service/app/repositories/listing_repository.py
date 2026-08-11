@@ -1,6 +1,7 @@
 from app.models.listing import Listing
 from app.core.config import get_config
 from shared.repositories.db_repository import DBRepository
+from shared.utils.exceptions import NoFetchedResultException
 
 class ListingRepository(DBRepository):
     def __init__(self):
@@ -27,3 +28,19 @@ class ListingRepository(DBRepository):
                 listing.address, listing.city, listing.state, listing.zip_code
             ]
         )
+    
+    def find_by_id(self, listing_id: int) -> Listing | None:
+        query = f"""
+            SELECT *
+            FROM {self._table_name}
+            WHERE listing_id = %s;
+        """
+        
+        try:
+            return self._execute_fetch_one(
+                query,
+                Listing,
+                values = [listing_id],
+            )
+        except NoFetchedResultException:
+            return None
