@@ -6,7 +6,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { fetchUser } from './api/fetchUser';
 
 import { type UserAuth } from './types/UserAuth';
 import { logger } from '@/utils/utils';
@@ -19,6 +18,7 @@ import { config } from '@/utils/config';
 import type { RegisterDTO } from './types/RegisterDTO';
 import { registerUser } from './api/registerUser';
 import type { LoginDTO } from './types/LoginDTO';
+import { fetchUser } from './api/fetchUser';
 
 const fileLogger = logger.ns('userContext').seal();
 const providerLogger = fileLogger.ns('provider').seal();
@@ -31,6 +31,7 @@ const AuthContext = createContext<{
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+
   const [userAuth, setUserAuth] = useState<UserAuth>(() => {
     return {
       currentUser: null,
@@ -54,6 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (err) {
       providerLogger.warn(`Unable to logout: ${err}`);
+      
+      // This is functionally similar to a successful logout
       setUserAuth({
         currentUser: null,
         status: 'unauthenticated'
