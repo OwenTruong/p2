@@ -17,8 +17,7 @@ def register(
     dto: UserCreateRequestDTO,
     auth_service: AuthService = Depends(get_auth_service)
 ) -> UserResponseDTO:
-    user = auth_service.save_user(dto)
-    return UserResponseDTO(**user)
+    return auth_service.save_user(dto)
 
 @router.post("/login", response_model=AuthSuccessResponse, status_code=status.HTTP_200_OK)
 def login(
