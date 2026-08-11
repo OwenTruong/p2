@@ -1,5 +1,6 @@
 from app.models.listing import Listing
 from app.core.config import get_config
+from app.models.listingFilter import FilterParams
 from shared.repositories.db_repository import DBRepository
 
 class ListingRepository(DBRepository):
@@ -27,6 +28,47 @@ class ListingRepository(DBRepository):
                 listing.address, listing.city, listing.state, listing.zip_code
             ]
         )
+
+    def find_all(self, params: FilterParams) -> list[Listing]:
+        conditions = []
+        values = []
+
+        if params.max_price is not None:
+            conditions.append("price_per_night <= %s")
+            values.append(params.max_price)
+
+        if params.min_beds:
+            conditions.append("bedrooms >= %s")
+            values.append(params.min_beds)
+
+        if params.min_bathrooms:
+            conditions.append("bathrooms >= %s")
+            values.append(params.min_bathrooms)
+
+        if params.city is not None:
+            conditions.append("city ILIKE %s")
+            values.append(params.city)
+
+        if params.state is not None:
+            conditions.append("state ILIKE %s")
+            values.append(params.state)
+
+        if params.guests > 1:
+            conditions.append("max_guests >= %s")
+            values.append(params.guests)
+
+        # Only ever return published/bookable listings
+        conditions.append("is_published = %s")
+        values.append(True)
+
+        where_clause = " AND ".join(conditions)
+
+        query = f"""
+            SELECT * FROM {self._table_name}
+            WHERE {where_clause};
+        """
+
+        return self._execute_fetch_all(query, Listing, values=values)
 
     def find_all_by_host_id(self, host_id: int) -> list[Listing]:
         query = f"""

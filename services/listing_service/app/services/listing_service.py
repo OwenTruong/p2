@@ -1,6 +1,7 @@
 from app.repositories.listing_repository import ListingRepository
 from app.dtos.listing import ListingCreateRequestDTO
 from app.models.listing import Listing
+from app.models.listingFilter import FilterParams
 
 class ListingService:
     def __init__(self, listing_repo: ListingRepository | None = None):
@@ -23,5 +24,7 @@ class ListingService:
         )
         return self.listing_repo.save(listing)
 
+    def find_all(self, query: FilterParams):
+        return self.listing_repo.find_all(query)
     def get_all_by_host_id(self, host_id: int) -> list[Listing]:
         return self.listing_repo.find_all_by_host_id(host_id)
