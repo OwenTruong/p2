@@ -4,18 +4,15 @@
 // import { logger } from "@/utils/utils";
 // import { UserLoginCredentialsError } from "../errors/UserLoginCredentialsError";
 // import { UserDeactivatedError } from "../errors/UserDeactivatedError";
+import { getAxios } from "@/utils/axios";
 import { LoginError } from "../errors/LoginError";
 import type { LoginDTO } from "../types/LoginDTO";
-// import { StatusError } from "@/errors/StatusError";
 import axios from "axios";
+// import { StatusError } from "@/errors/StatusError";
 
 // const fileLogger = logger.ns("auth").seal();
 // const mainLogger = fileLogger.ns("loginUser").seal();
 
-const api = axios.create({
-  baseURL: "http://localhost:8010/api",
-  withCredentials: true,
-});
 
 /**
  *
@@ -31,11 +28,10 @@ export async function loginUser(
   loginDTO: LoginDTO,
 ): Promise<void> {
 
-  console.log(url)
-  
   try {
-    const response = await api.post(
-      "/auth/login",
+
+    const response = await getAxios().post(
+      url,
       loginDTO
     );
 
