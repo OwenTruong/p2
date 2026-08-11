@@ -2,7 +2,9 @@ from app.repositories.listing_repository import ListingRepository
 from app.dtos.listing import ListingCreateRequestDTO
 from app.models.listing import Listing
 from shared.dtos.auth_user import AuthenticatedUser
-from fastapi import HTTPException, status
+from fastapi import status
+from shared.dtos.errors import ApiErrorDTO
+from shared.exceptions.exceptions import ApiException
 
 class ListingService:
     def __init__(self, listing_repo: ListingRepository | None = None):
@@ -32,9 +34,11 @@ class ListingService:
         listing = self.listing_repo.find_by_id(listing_id)
 
         if listing is None:
-            raise HTTPException(
+            raise ApiException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Listing not found",
+                errors=[
+                    ApiErrorDTO(message="Listing not found.")
+                ],
             )
         
         # Published listings can be viewed by anyone
@@ -43,16 +47,24 @@ class ListingService:
         
         # Unpublished listings require authentication
         if current_user is None:
-            raise HTTPException(
+            raise ApiException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication required to view this listing",
+                errors=[
+                    ApiErrorDTO(
+                        message="Authentication required to view this listing."
+                    )
+                ],
             )
         
         # Unpublished listings can only be viewed by owner
         if listing.host_id != current_user.user_id:
-            raise HTTPException(
+            raise ApiException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have permission to view this listing",
+                errors=[
+                    ApiErrorDTO(
+                        message="You do not have permission to view this listing."
+                    )
+                ],
             )
         
         return listing

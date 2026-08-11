@@ -29,6 +29,10 @@ def get_current_user(request: Request) -> AuthenticatedUser:
     )
 
 def get_optional_current_user(request: Request) -> AuthenticatedUser | None:
+    """
+    Checks if the user is logged in, but doesn't require them to be.
+    Returns the user if authenticated, otherwise returns None.
+    """
     token = request.cookies.get("access_token")
 
     if not token:
