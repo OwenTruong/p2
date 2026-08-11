@@ -19,9 +19,7 @@ class AuthService:
             raise ApiException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 errors=[
-                    ApiErrorDTO(
-                        message="Invalid email or password."
-                    )
+                    ApiErrorDTO(message="Invalid email or password.")
                 ]
             )
 
@@ -29,9 +27,7 @@ class AuthService:
             raise ApiException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 errors=[
-                    ApiErrorDTO(
-                        message="account is inactive"
-                    )
+                    ApiErrorDTO(message="Account is inactive.")
                 ]
             )
 
