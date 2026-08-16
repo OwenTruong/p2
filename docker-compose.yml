@@ -55,6 +55,16 @@ services:
         - *common-api-environment
         - *common-backend-environment
       DB_NAME: ${AUTH_DB_NAME}
+    healthcheck:
+      test: [
+        "CMD",
+        "python",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     depends_on:
       auth_migrate:
         condition: service_completed_successfully
@@ -124,6 +134,20 @@ services:
       postgresql:
         condition: service_healthy
     restart: 'no'
+
+  seed_auth:
+    build:
+      context: .
+      dockerfile: services/auth_service/Dockerfile
+    command: ["python", "-m", "app.seed"]
+    environment:
+      <<:
+        - *common-db-environment
+      DB_NAME: ${AUTH_DB_NAME}
+    depends_on:
+      auth_service:
+        condition: service_healthy
+    restart: "no"
 
   postgresql:
     image: postgres:15-alpine
