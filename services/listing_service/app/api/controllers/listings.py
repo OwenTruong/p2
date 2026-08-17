@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, Request, status, HTTPException
 from fastapi import APIRouter, Depends, status, Query
 from app.dtos.listing import ListingCreateRequestDTO, ListingResponseDTO
 from app.services.listing_service import ListingService
@@ -22,8 +22,12 @@ def create_listing(
     return ListingResponseDTO.model_validate(created_listing)
 
 @router.get("", status_code=status.HTTP_200_OK)
-def get_listings(params: FilterParams = Query()):
+def get_listings(request: Request):
+
+    raw_params = dict(request.query_params)
+    params = FilterParams.model_validate(raw_params)
     return listing_service.find_all(params)
+
 @router.get("/me", status_code=status.HTTP_200_OK)
 def get_my_listings(
     auth_user : AuthenticatedUser = Depends(get_current_user)
