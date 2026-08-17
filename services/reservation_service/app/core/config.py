@@ -1,0 +1,37 @@
+import os
+from dotenv import load_dotenv
+
+from ..dtos.config import Config
+
+load_dotenv()
+
+# intentionally using invalid defaults to find error in config if any
+__config = Config(
+  db_host = os.getenv("DB_HOST", "10.0.3.254"),
+  db_name = os.getenv("DB_NAME", "my_db"),
+  db_user = os.getenv("DB_USER", "my_db_user"),
+  db_password = os.getenv("DB_PASSWORD", "MyPassword1234"),
+  db_port = int(os.getenv("DB_PORT", 1000)),
+  
+  mode = "Production" if os.getenv("MODE") == "Production" else "Development",
+  cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
+
+  listing_service_url= os.getenv("INTERNAL_DNS_LISTING_SERVICE_URL", "http://listing-service:8000")
+)
+
+print(f"""Config Loaded:
+  db_host: {__config.db_host}
+  db_name: {__config.db_name}
+  db_user: {__config.db_user}
+  db_password: REDACTED
+  db_port: {__config.db_port}
+
+  mode: {__config.mode}
+  cors_origin_url: {__config.cors_origin_url}
+
+  listing_service_url: {__config.listing_service_url}
+""")
+
+
+def get_config():
+  return __config
