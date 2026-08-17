@@ -50,10 +50,10 @@ class ListingResponseDTO(BaseModel):
 
 class ListingUpdateRequestDTO(BaseModel):
     title: str = Field(..., min_length=1, max_length=256, examples=["Updated Downtown Apartment"])
-    description: str | None = Field(default=None, max_length=512, examples=["Updated description."])
+    description: str = Field(default=None, max_length=512, examples=["Updated description."])
     price_per_night: Decimal = Field(..., gt=0, max_digits=10, decimal_places=2, examples=["135.00"])
     max_guests: int = Field(..., gt=0, examples=[4])
-    beds: int = Field(..., gt=0, examples=[2])
+    bedrooms: int = Field(..., gt=0, examples=[2])
     bathrooms: int = Field(..., gt=0, examples=[1])
     is_published: bool = Field(..., examples=[True])
     address: str = Field(..., min_length=1, max_length=150, examples=["100 Main Street"])
