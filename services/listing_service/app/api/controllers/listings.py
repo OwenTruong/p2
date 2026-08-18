@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, HTTPException, Query
 from app.dtos.listing import ListingCreateRequestDTO, ListingResponseDTO, ListingUpdateRequestDTO
 from app.services.listing_service import ListingService
 from shared.dependencies.auth import get_current_user, get_optional_current_user
 from shared.dtos.auth_user import AuthenticatedUser
+from shared.utils.exceptions import ActiveReservationException, NoFetchedResultException, UserDoesNotOwnException
 from app.models.listingFilter import FilterParams
 
 router = APIRouter(prefix="/api/listings", tags=["Listings"])
@@ -21,6 +21,37 @@ def create_listing(
     
     return ListingResponseDTO.model_validate(created_listing)
 
+@router.delete("/{listing_id}", status_code=status.HTTP_200_OK)
+def delete_listing(
+    listing_id: int,
+    current_user: AuthenticatedUser = Depends(get_current_user)
+):
+    try:
+        listing_service.delete_listing(current_user.user_id, listing_id)
+    except UserDoesNotOwnException as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, {
+            "errors": [
+                {
+                    "message": "User does not own the listing."
+                }
+            ]
+        })
+    except ActiveReservationException as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, {
+            "errors": [
+                {
+                    "message": "Listing does not exist."
+                }
+            ]
+        })
+    except NoFetchedResultException as e:
+        raise HTTPException(status.HTTP_409_CONFLICT, {
+            "errors": [
+                {
+                    "message": "Listing maybe not be removed due to an active reservation."
+                }
+            ]
+        })
 @router.put("/{id}", response_model=ListingResponseDTO, status_code=status.HTTP_200_OK)
 def update_listing(
     id: int,
@@ -37,6 +68,7 @@ def update_listing(
 @router.get("", status_code=status.HTTP_200_OK)
 def get_listings(params: FilterParams = Query()):
     return listing_service.find_all(params)
+
 @router.get("/me", status_code=status.HTTP_200_OK)
 def get_my_listings(
     auth_user : AuthenticatedUser = Depends(get_current_user)

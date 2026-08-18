@@ -31,11 +31,10 @@ const AuthContext = createContext<{
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-
   const [userAuth, setUserAuth] = useState<UserAuth>(() => {
     return {
       currentUser: null,
-      status: 'loading'
+      status: 'loading',
     };
   });
 
@@ -51,15 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await logoutUser(config.logoutPath);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated'
+        status: 'unauthenticated',
       });
     } catch (err) {
       providerLogger.warn(`Unable to logout: ${err}`);
-      
+
       // This is functionally similar to a successful logout
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated'
+        status: 'unauthenticated',
       });
     }
   }, []);
@@ -82,22 +81,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setUserAuth({
         currentUser: null,
-        status: 'loading'
+        status: 'loading',
       });
       await loginUser(config.loginPath, loginDTO);
       const user = await fetchUser(config.fetchUserPath);
       setUserAuth({
         currentUser: user,
-        status: 'authenticated'
+        status: 'authenticated',
       });
     } catch (err) {
       providerLogger.warn(`Unable to login: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated'
+        status: 'unauthenticated',
       });
 
-      throw err
+      throw err;
     }
   }, []);
 
@@ -120,18 +119,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       providerLogger.ns('register').info('Now registering');
       setUserAuth({
         currentUser: null,
-        status: 'loading'
+        status: 'loading',
       });
       await registerUser(config.registerPath, registerDTO);
-
+      setUserAuth({
+        currentUser: null,
+        status: 'unauthenticated',
+      });
     } catch (err) {
       providerLogger.warn(`Unable to register: ${err}`);
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated'
+        status: 'unauthenticated',
       });
 
-      throw err
+      throw err;
     }
   }, []);
 
@@ -143,14 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled)
           setUserAuth({
             currentUser: user,
-            status: 'authenticated'
+            status: 'authenticated',
           });
       } catch (err) {
         if (!cancelled) {
           providerLogger.warn(`Unable to fetch user on load: ${err}`);
           setUserAuth({
             currentUser: null,
-            status: 'unauthenticated'
+            status: 'unauthenticated',
           });
         }
       }
@@ -164,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const onUnauthorized = () => {
       setUserAuth({
         currentUser: null,
-        status: 'unauthenticated'
+        status: 'unauthenticated',
       });
     };
     window.addEventListener(eventNames.UNAUTHORIZED, onUnauthorized);
