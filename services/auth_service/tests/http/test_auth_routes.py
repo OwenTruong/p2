@@ -6,6 +6,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
 from app.api.controllers import auth
+from shared.exceptions.exception_handlers import register_exception_handlers
+from shared.exceptions.exceptions import EmailAlreadyExistsException
 from shared.utils.exceptions import UniqueRowException
 
 @pytest.fixture
@@ -16,6 +18,8 @@ def mock_auth_service():
 def client(mock_auth_service):
     app = FastAPI()
     app.include_router(auth.router)
+
+    register_exception_handlers(app)
 
     app.dependency_overrides[auth.get_auth_service] = (
         lambda: mock_auth_service
@@ -28,7 +32,11 @@ def client(mock_auth_service):
 
 def test_register_returns_201(client, mock_auth_service):
     mock_auth_service.save_user.return_value = SimpleNamespace(
-        email="john@example.com"
+        user_id=1,
+        email="john@example.com",
+        first_name="John",
+        last_name="Doe",
+        status="Active"
     )
 
     response = client.post(
@@ -43,8 +51,11 @@ def test_register_returns_201(client, mock_auth_service):
 
     assert response.status_code == 201
     assert response.json() == {
-        "status": "success",
-        "detail": "Account for user `john@example.com` has been provisioned",
+        "user_id": 1,
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe",
+        "status": "Active"
     }
 
     mock_auth_service.save_user.assert_called_once()
@@ -58,18 +69,8 @@ def test_register_returns_201(client, mock_auth_service):
 def test_register_returns_409_when_email_exists(
     client, mock_auth_service
 ):
-    mock_auth_service.save_user.side_effect = UniqueRowException()
+    mock_auth_service.save_user.side_effect = EmailAlreadyExistsException()
 
-    client.post(
-        "/api/auth/register",
-        json={
-            "email": "john@example.com",
-            "password": "password123",
-            "first_name": "John",
-            "last_name": "Doe",
-        },
-    )
-    
     response = client.post(
         "/api/auth/register",
         json={
@@ -77,12 +78,16 @@ def test_register_returns_409_when_email_exists(
             "password": "password123",
             "first_name": "John",
             "last_name": "Doe",
-        },
+        }
     )
 
     assert response.status_code == 409
     assert response.json() == {
-        "detail": "User with this email already exists"
+        "errors": [
+            {
+                "message": "User with this email already exists."
+            }
+        ]
     }
 
 def test_register_returns_422_for_invalid_request(client):

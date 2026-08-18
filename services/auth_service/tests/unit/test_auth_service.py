@@ -17,6 +17,7 @@ def test_authenticate_user_returns_user_and_token():
     repository = Mock()
 
     stored_user = SimpleNamespace(
+        user_id=1,
         email="john@example.com",
         password_hash="stored-hash",
         status="Active",
