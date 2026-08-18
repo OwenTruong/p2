@@ -26,3 +26,38 @@ class EmailAlreadyExistsException(ApiException):
                 ApiErrorDTO(message="User with this email already exists.")
             ]
         )    
+
+class ReservationNotFoundException(ApiException):
+    def __init__(
+        self
+    ):
+        super().__init__(
+            404,
+            [
+                ApiErrorDTO(message="Reservation not found.")
+            ]
+        )
+
+
+class ListingNotFoundException(ApiException):
+    def __init__(self):
+        super().__init__(
+            404,
+            [
+                ApiErrorDTO(
+                    message="Listing not found."
+                )
+            ],
+        )
+
+
+class ListingUnavailableException(ApiException):
+    def __init__(self):
+        super().__init__(
+            409,
+            [
+                ApiErrorDTO(
+                    message="Listing is unpublished or unavailable."
+                )
+            ],
+        )

@@ -87,6 +87,24 @@ services:
       listing_migrate:
         condition: service_completed_successfully
 
+  reservation_service:
+    build:
+      context: .
+      dockerfile: services/reservation_service/Dockerfile
+    container_name: reservation-server
+    env_file: '.env'
+    ports:
+      - '${RESERVATION_PORT:-8004}:8000'
+    environment:
+      <<:
+        - *common-db-environment
+        - *common-api-environment
+        - *common-backend-environment
+      DB_NAME: ${RESERVATION_DB_NAME}
+    depends_on:
+      reservation_migrate:
+        condition: service_completed_successfully
+
   sample_service:
     build:
       context: .
@@ -130,6 +148,21 @@ services:
       <<:
         - *common-db-environment
       DB_NAME: ${LISTING_DB_NAME}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: 'no'
+
+  reservation_migrate:
+    build:
+      context: .
+      dockerfile: services/reservation_service/Dockerfile
+    command: ['python', '-m', 'app.migrate']
+    env_file: '.env'
+    environment:
+      <<:
+        - *common-db-environment
+      DB_NAME: ${RESERVATION_DB_NAME}
     depends_on:
       postgresql:
         condition: service_healthy

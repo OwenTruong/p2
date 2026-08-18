@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, Request, status, HTTPException
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Request
 from app.dtos.listing import ListingCreateRequestDTO, ListingResponseDTO
 from app.services.listing_service import ListingService
 from shared.dependencies.auth import get_current_user, get_optional_current_user
