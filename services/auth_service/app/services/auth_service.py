@@ -6,7 +6,7 @@ from app.core.security import verify_password, create_access_token, hash_passwor
 from app.dtos.user_dto import UserCreateRequestDTO, UserResponseDTO
 from shared.dtos.errors import ApiErrorDTO
 from shared.exceptions.exceptions import ApiException, EmailAlreadyExistsException
-from shared.utils.exceptions import UniqueRowException
+from shared.utils.exceptions import UnexpectedException, UniqueRowException
 
 
 class AuthService:
@@ -35,7 +35,7 @@ class AuthService:
         token = create_access_token(user.user_id, user.email)
         return user, token
 
-    def save_user(self, dto: UserCreateRequestDTO) -> User:
+    def save_user(self, dto: UserCreateRequestDTO) -> UserResponseDTO:
         user = User(
                     email=dto.email,
                     password_hash=hash_password(dto.password),
@@ -44,6 +44,8 @@ class AuthService:
                 )
         try:      
             saved_user = self.user_repo.save(user)
+            if saved_user.user_id == None:
+                raise UnexpectedException("User ID should exist.")
             return UserResponseDTO(
                 user_id=saved_user.user_id,
                 email=saved_user.email,

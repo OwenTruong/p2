@@ -30,7 +30,7 @@ export default function Page() {
   const [formError, setFormError] = useState<string[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  
+
   const pending = useRef(false);
 
   useEffect(() => {
@@ -43,7 +43,9 @@ export default function Page() {
     } else if (userAuth.status === 'unauthenticated') {
       pending.current = false;
       setSubmitting(false);
-      setFormError(['Registration failed. Please check your input and try again.']);
+      setFormError([
+        'Registration failed. Please check your input and try again.',
+      ]);
     }
   }, [userAuth, navigate]);
 
@@ -82,7 +84,7 @@ export default function Page() {
       setFormError(
         error instanceof RegistrationError
           ? error.errors.map((err) => err.message)
-          : ['An unexpected error occurred. Please try again later.']
+          : ['An unexpected error occurred. Please try again later.'],
       );
     } finally {
       setSubmitting(false);
@@ -129,7 +131,9 @@ export default function Page() {
               minLength={2}
               maxLength={64}
               aria-invalid={!!fieldErrors.first_name || undefined}
-              aria-describedby={fieldErrors.first_name ? 'first-name-error' : undefined}
+              aria-describedby={
+                fieldErrors.first_name ? 'first-name-error' : undefined
+              }
               required
             />
 
@@ -156,7 +160,9 @@ export default function Page() {
               minLength={2}
               maxLength={64}
               aria-invalid={!!fieldErrors.last_name || undefined}
-              aria-describedby={fieldErrors.last_name ? 'last-name-error' : undefined}
+              aria-describedby={
+                fieldErrors.last_name ? 'last-name-error' : undefined
+              }
               required
             />
 
@@ -208,7 +214,9 @@ export default function Page() {
               minLength={8}
               maxLength={128}
               aria-invalid={!!fieldErrors.password || undefined}
-              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+              aria-describedby={
+                fieldErrors.password ? 'password-error' : undefined
+              }
               required
             />
 
@@ -236,7 +244,9 @@ export default function Page() {
               maxLength={128}
               aria-invalid={!!fieldErrors.confirmPassword || undefined}
               aria-describedby={
-                fieldErrors.confirmPassword ? 'confirm-password-error' : undefined
+                fieldErrors.confirmPassword
+                  ? 'confirm-password-error'
+                  : undefined
               }
               required
             />
@@ -269,7 +279,6 @@ export default function Page() {
     </main>
   );
 }
-
 
 function validateRegistration(input: {
   firstName: string;
