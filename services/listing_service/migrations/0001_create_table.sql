@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS listings (
 
     title VARCHAR(128) NOT NULL,
     description VARCHAR(1024) NOT NULL,
+    url VARCHAR(1024) NOT NULL,
 
     price_per_night NUMERIC(10, 2) NOT NULL
         CHECK (price_per_night >= 0),

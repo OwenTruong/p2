@@ -83,6 +83,16 @@ services:
         - *common-api-environment
         - *common-backend-environment
       DB_NAME: ${LISTING_DB_NAME}
+    healthcheck:
+      test: [
+        "CMD",
+        "python",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     depends_on:
       listing_migrate:
         condition: service_completed_successfully
@@ -168,17 +178,18 @@ services:
         condition: service_healthy
     restart: 'no'
 
-  seed_auth:
+  seed:
     build:
       context: .
-      dockerfile: services/auth_service/Dockerfile
-    command: ["python", "-m", "app.seed"]
+      dockerfile: scripts/seed/Dockerfile
     environment:
       <<:
         - *common-db-environment
-      DB_NAME: ${AUTH_DB_NAME}
+        - *common-api-environment
     depends_on:
       auth_service:
+        condition: service_healthy
+      listing_service:
         condition: service_healthy
     restart: "no"
 

@@ -16,7 +16,7 @@ __config = Config(
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
   cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
 
-  listing_service_url= os.getenv("INTERNAL_DNS_LISTING_SERVICE_URL", "http://listing-service:8000")
+  listing_service_url= os.getenv("INTERNAL_DNS_LISTING_SERVICE_URL", "http://listing_service:8000")
 )
 
 print(f"""Config Loaded:
