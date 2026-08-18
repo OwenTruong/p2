@@ -3,6 +3,7 @@ export interface Listing {
   host_id: number;
   title: string;
   description: string;
+  url: string;
   price_per_night: string;
   max_guests: number;
   beds: number;
