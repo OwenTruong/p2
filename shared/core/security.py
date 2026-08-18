@@ -3,7 +3,7 @@ from fastapi import status
 from shared.dtos.auth_user import AuthenticatedUser
 from shared.core.config import get_shared_config
 from shared.dtos.errors import ApiErrorDTO
-from shared.exceptions.exceptions import ApiException
+from shared.exceptions.exceptions import UnauthorizedException
 
 def verify_jwt_token(token: str) -> AuthenticatedUser:
     """
@@ -15,16 +15,7 @@ def verify_jwt_token(token: str) -> AuthenticatedUser:
         return jwt.decode(token, config.jwt_secret_key, algorithms=[config.jwt_algorithm])
         
     except jwt.ExpiredSignatureError:
-        raise ApiException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            errors=[
-                ApiErrorDTO(message="Token has expired")
-            ]
-        )
+        raise UnauthorizedException("Token has expired")
+    
     except (jwt.PyJWTError, ValueError):
-        raise ApiException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            errors=[
-                ApiErrorDTO(message="Invalid or modified token")
-            ]
-        )
+        raise UnauthorizedException("Invalid or modified token")
