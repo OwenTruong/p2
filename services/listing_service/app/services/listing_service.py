@@ -17,6 +17,7 @@ class ListingService:
             host_id=host_id,  
             title=dto.title,
             description=dto.description,
+            url=dto.url,
             price_per_night=dto.price_per_night,
             max_guests=dto.max_guests,
             bedrooms=dto.bedrooms,
@@ -39,6 +40,7 @@ class ListingService:
 
         existing_listing.title = dto.title
         existing_listing.description = dto.description
+        existing_listing.url = dto.url
         existing_listing.price_per_night = dto.price_per_night
         existing_listing.max_guests = dto.max_guests
         existing_listing.bedrooms = dto.bedrooms
@@ -77,6 +79,7 @@ class ListingService:
 
     def find_all(self, query: FilterParams):
         return self.listing_repo.find_all(query)
+    
     def get_all_by_host_id(self, host_id: int) -> list[Listing]:
         return self.listing_repo.find_all_by_host_id(host_id)
     

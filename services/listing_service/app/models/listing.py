@@ -7,6 +7,7 @@ class Listing(BaseModel):
     listing_id: int | None = Field(default=None, ge=1)
     host_id: int = Field(ge=1)
     title: str = Field(examples=["Cozy Downtown Apartment"], min_length=1, max_length=128)
+    url: str
     description: str = Field(min_length=1, max_length=1024)
     price_per_night: Decimal = Field(
         gt=0,

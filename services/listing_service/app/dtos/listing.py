@@ -6,6 +6,7 @@ import re
 class ListingCreateRequestDTO(BaseModel):
     title: str = Field(..., min_length=1, max_length=256, examples=["Downtown Apartment"])
     description: str = Field(default=None, max_length=512, examples=["Two-bedroom apartment near downtown."])
+    url: str = Field(default=None, max_length=512, examples=["https://images.squarespace-cdn.com/content/v1/6671cdf4eb7de91f577a464e/1760034971967-ZUG8QSHUXLKIZOEGRV14/The+Risks+of+Overpricing_+What+Owasso+Homeowners+Should+Know+1.png"])
     price_per_night: Decimal = Field(gt=0, max_digits=10, decimal_places=2, examples=[Decimal("125.00")],)
     max_guests: int = Field(..., gt=0, examples=[4])
     bedrooms: int = Field(..., gt=0, examples=[2])
@@ -38,6 +39,7 @@ class ListingResponseDTO(BaseModel):
     host_id: int
     title: str
     description: str | None
+    url: str | None
     price_per_night: Decimal
     max_guests: int
     bedrooms: int
@@ -51,6 +53,7 @@ class ListingResponseDTO(BaseModel):
 class ListingUpdateRequestDTO(BaseModel):
     title: str = Field(..., min_length=1, max_length=256, examples=["Updated Downtown Apartment"])
     description: str = Field(default=None, max_length=512, examples=["Updated description."])
+    url: str = Field(default=None, max_length=512, examples=["https://images.squarespace-cdn.com/content/v1/6671cdf4eb7de91f577a464e/1760034971967-ZUG8QSHUXLKIZOEGRV14/The+Risks+of+Overpricing_+What+Owasso+Homeowners+Should+Know+1.png"])
     price_per_night: Decimal = Field(..., gt=0, max_digits=10, decimal_places=2, examples=["135.00"])
     max_guests: int = Field(..., gt=0, examples=[4])
     bedrooms: int = Field(..., gt=0, examples=[2])

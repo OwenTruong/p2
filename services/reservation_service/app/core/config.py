@@ -12,9 +12,11 @@ __config = Config(
   db_user = os.getenv("DB_USER", "my_db_user"),
   db_password = os.getenv("DB_PASSWORD", "MyPassword1234"),
   db_port = int(os.getenv("DB_PORT", 1000)),
-
+  
   mode = "Production" if os.getenv("MODE") == "Production" else "Development",
   cors_origin_url= os.getenv("CORS_ORIGIN_URL", "http://localhost:8080"),
+
+  listing_service_url= os.getenv("INTERNAL_DNS_LISTING_SERVICE_URL", "http://listing_service:8000")
 )
 
 print(f"""Config Loaded:
@@ -26,6 +28,8 @@ print(f"""Config Loaded:
 
   mode: {__config.mode}
   cors_origin_url: {__config.cors_origin_url}
+
+  listing_service_url: {__config.listing_service_url}
 """)
 
 

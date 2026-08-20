@@ -83,8 +83,36 @@ services:
         - *common-api-environment
         - *common-backend-environment
       DB_NAME: ${LISTING_DB_NAME}
+    healthcheck:
+      test: [
+        "CMD",
+        "python",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     depends_on:
       listing_migrate:
+        condition: service_completed_successfully
+
+  reservation_service:
+    build:
+      context: .
+      dockerfile: services/reservation_service/Dockerfile
+    container_name: reservation-server
+    env_file: '.env'
+    ports:
+      - '${RESERVATION_PORT:-8004}:8000'
+    environment:
+      <<:
+        - *common-db-environment
+        - *common-api-environment
+        - *common-backend-environment
+      DB_NAME: ${RESERVATION_DB_NAME}
+    depends_on:
+      reservation_migrate:
         condition: service_completed_successfully
 
   sample_service:
@@ -135,17 +163,33 @@ services:
         condition: service_healthy
     restart: 'no'
 
-  seed_auth:
+  reservation_migrate:
     build:
       context: .
-      dockerfile: services/auth_service/Dockerfile
-    command: ["python", "-m", "app.seed"]
+      dockerfile: services/reservation_service/Dockerfile
+    command: ['python', '-m', 'app.migrate']
+    env_file: '.env'
     environment:
       <<:
         - *common-db-environment
-      DB_NAME: ${AUTH_DB_NAME}
+      DB_NAME: ${RESERVATION_DB_NAME}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: 'no'
+
+  seed:
+    build:
+      context: .
+      dockerfile: scripts/seed/Dockerfile
+    environment:
+      <<:
+        - *common-db-environment
+        - *common-api-environment
     depends_on:
       auth_service:
+        condition: service_healthy
+      listing_service:
         condition: service_healthy
     restart: "no"
 

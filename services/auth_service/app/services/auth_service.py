@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import status
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
 from app.dtos.auth import LoginRequest

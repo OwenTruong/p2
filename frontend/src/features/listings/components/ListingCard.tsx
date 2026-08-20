@@ -1,21 +1,23 @@
 import styles from "./ListingCard.module.css";
 
 import type { Listing } from "../types";
-import placeholderImage from "../../../assets/house-ex.jpeg";
+import { Link } from "react-router-dom";
 
 interface ListingCardProps {
   listing: Listing;
-  onClick?: () => void;
+  linkNav: string;
 }
 
-export default function ListingCard({ listing, onClick }: ListingCardProps) {
+export default function ListingCard({ listing, linkNav }: ListingCardProps) {
   return (
-    <div className={styles.card} onClick={onClick}>
-      {/* Placeholder image */}
+    <Link 
+    className={styles.card} 
+    to={linkNav}>
+      {/* Listing image */}
       <img
         className={styles.image}
-        src={placeholderImage}
-        alt="Listing placeholder"
+        src={listing.url}
+        alt="listing image"
       />
 
       {/* Listing title */}
@@ -37,6 +39,6 @@ export default function ListingCard({ listing, onClick }: ListingCardProps) {
       >
         {listing.is_published ? "Published" : "Unpublished"}
       </span>
-    </div>
+    </Link>
   );
 }

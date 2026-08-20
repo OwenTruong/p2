@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "./MyListingsPage.module.css";
 
 import { getMyListings } from "../api/listings";
-import ListingCard from "../components/ListingCard";
 import type { Listing } from "../types";
+import ListingGrid from "../components/ListingGrid";
 
 export default function MyListingsPage() {
   // React Router navigation
@@ -65,16 +65,10 @@ export default function MyListingsPage() {
         </button>
       </div>
 
-      <div className={styles.listingsGrid}>
-        {/* Render a card for each listing */}
-        {listings.map((listing) => (
-          <ListingCard
-            key={listing.listing_id}
-            listing={listing}
-            onClick={() => navigate(`/my-listings/${listing.listing_id}`)}
-          />
-        ))}
-      </div>
+      <ListingGrid
+        listings={listings}
+        getLink={(listing) => `/my-listings/${listing.listing_id}`} />
+
     </div>
   );
 }

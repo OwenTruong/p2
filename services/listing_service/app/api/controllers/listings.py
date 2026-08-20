@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Query
+from fastapi import APIRouter, Depends, Request, status, HTTPException, Query
 from app.dtos.listing import ListingCreateRequestDTO, ListingResponseDTO, ListingUpdateRequestDTO
 from app.services.listing_service import ListingService
 from shared.dependencies.auth import get_current_user, get_optional_current_user
@@ -66,7 +66,10 @@ def update_listing(
     return ListingResponseDTO.model_validate(updated_listing)
 
 @router.get("", status_code=status.HTTP_200_OK)
-def get_listings(params: FilterParams = Query()):
+def get_listings(request: Request):
+
+    raw_params = dict(request.query_params)
+    params = FilterParams.model_validate(raw_params)
     return listing_service.find_all(params)
 
 @router.get("/me", status_code=status.HTTP_200_OK)
