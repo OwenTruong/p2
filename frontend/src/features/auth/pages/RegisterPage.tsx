@@ -27,7 +27,7 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [formError, setFormError] = useState<string[] | null>(null);
+  const [formError, setFormError] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
@@ -67,7 +67,7 @@ export default function Page() {
     }
 
     setFieldErrors({});
-    setFormError(null);
+    setFormError([]);
     setSubmitting(true);
 
     const registerDTO: RegisterDTO = {
@@ -81,11 +81,17 @@ export default function Page() {
       await register(registerDTO);
       navigate('/login', { replace: true });
     } catch (error) {
-      setFormError(
-        error instanceof RegistrationError
-          ? error.errors.map((err) => err.message)
-          : ['An unexpected error occurred. Please try again later.'],
-      );
+      
+      if (error instanceof RegistrationError) {
+        const messages = error.errors.map((e) => e.message);
+
+        console.log("messages:", messages);
+        setFormError(messages);
+      } else {
+        setFormError([
+          "An unexpected error occurred. Please try again later.",
+        ]);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -105,14 +111,18 @@ export default function Page() {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          {formError && (
-            <p className={styles.alert} role="alert">
+          {(
+            <>
+            <p>Test</p>
+            <div className={styles.alert} role="alert">
               <ul>
                 {formError.map((err, i) => (
                   <li key={i}>{err}</li>
                 ))}
               </ul>
-            </p>
+            </div>
+            </>
+
           )}
 
           <div className={styles.field}>

@@ -12,21 +12,20 @@ import RegisterPage from "../../features/auth/pages/RegisterPage";
 import AppLayout from "../../layouts/AppLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
-
-function CreateListingPage() {
-  return <h1>Create Listing (Coming Soon)</h1>;
-}
-
-function ListingDetailsPage() {
-  return <h1>Listing Details (Coming Soon)</h1>;
-}
+import ListingDetailsPage from "@/features/listings/pages/ListingDetailsPage";
+import { CreateListingPage } from "@/features/listings/pages/CreateListingPage";
+import { UpdateListingPage } from "@/features/listings/pages/UpdateListingPage";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<AppLayout />}>
       {/* Public */}
       <Route path="/" element={<HomePage />} />
-      
+      <Route
+        path="/listings/:listingId"
+        element={<ListingDetailsPage />}
+      />
+
       {/* Guest only */}
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
@@ -42,7 +41,7 @@ export const router = createBrowserRouter(
         />
         <Route
           path="/my-listings/:listingId"
-          element={<ListingDetailsPage />}
+          element={<UpdateListingPage />}
         />
 
         <Route

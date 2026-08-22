@@ -1,0 +1,259 @@
+.page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Header */
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.header p {
+  margin-top: 0.5rem;
+  color: #6b7280;
+}
+
+/* Image */
+
+.imageSection {
+  margin-bottom: 2rem;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #e5e7eb;
+  border-radius: 0.75rem;
+  color: #6b7280;
+}
+
+/* Main layout */
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
+}
+
+/* Listing information */
+
+.hostSection {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hostSection h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  color: #4b5563;
+}
+
+.descriptionSection {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.descriptionSection h2,
+.locationSection h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.descriptionSection p,
+.locationSection p {
+  color: #374151;
+  line-height: 1.625;
+}
+
+.locationSection {
+  padding: 1.5rem 0;
+}
+
+/* Reservation card */
+
+.reservationCard {
+  position: sticky;
+  top: 1.5rem;
+
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+
+  background-color: white;
+
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.price {
+  margin-bottom: 1.25rem;
+}
+
+.priceAmount {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.priceUnit {
+  color: #4b5563;
+}
+
+/* Dates */
+
+.dateFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+
+  overflow: hidden;
+}
+
+.dateField {
+  padding: 0.75rem;
+}
+
+.dateField:first-child {
+  border-right: 1px solid #d1d5db;
+}
+
+.dateField label,
+.guestField label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dateField input,
+.guestField select {
+  width: 100%;
+  margin-top: 0.25rem;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+}
+
+/* Guests */
+
+.guestField {
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+/* Reserve */
+
+.reserveButton {
+  width: 100%;
+  padding: 0.75rem;
+
+  border: none;
+  border-radius: 0.5rem;
+
+  background-color: #000;
+  color: white;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: background-color 0.2s;
+}
+
+.reserveButton:hover {
+  background-color: #1f2937;
+}
+
+.chargeNotice {
+  margin-top: 0.75rem;
+
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Price breakdown */
+
+.priceBreakdown {
+  margin-top: 1.5rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  font-size: 0.875rem;
+}
+
+.priceBreakdown > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.priceBreakdown .total {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+
+  font-weight: 600;
+}
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reservationCard {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 1.5rem 1rem;
+  }
+
+  .imagePlaceholder {
+    height: 280px;
+  }
+
+  .features {
+    gap: 0.5rem 1rem;
+  }
+
+  .dateFields {
+    grid-template-columns: 1fr;
+  }
+
+  .dateField:first-child {
+    border-right: none;
+    border-bottom: 1px solid #d1d5db;
+  }
+}

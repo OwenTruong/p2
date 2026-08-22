@@ -18,7 +18,19 @@ export const logoutPath = joinPaths(authServiceUrl, "/api/auth/logout");
 export const registerPath = joinPaths(authServiceUrl, "/api/auth/register");
 export const fetchUserPath = joinPaths(authServiceUrl, "/api/users/me");
 
-export const getListingsPath = joinPaths(listingServiceUrl, "/api/listings/me")
+
+export const baseListingPath = joinPaths(listingServiceUrl, "/api/listings")
+export const getMyListingsPath = joinPaths(baseListingPath, "/me")
+export function getListingDetailsPath(id: number): string {
+    return joinPaths(listingServiceUrl, `/api/listings/${id}`);
+}
+export function updateListingPath(id: number): string {
+    return joinPaths(baseListingPath, `/${id}`);
+}
+export function deleteListingPath(id: number): string {
+    return joinPaths(baseListingPath, `/${id}`);
+}
+
 export const config = {
   loginPath,
   logoutPath,

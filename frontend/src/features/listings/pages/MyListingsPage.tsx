@@ -6,6 +6,7 @@ import styles from "./MyListingsPage.module.css";
 import { getMyListings } from "../api/listings";
 import type { Listing } from "../types";
 import ListingGrid from "../components/ListingGrid";
+// import { ListingError } from "../errors/ListingError";
 
 export default function MyListingsPage() {
   // React Router navigation
@@ -19,6 +20,7 @@ export default function MyListingsPage() {
 
   // Store any error message if the request fails
   const [error, setError] = useState("");
+  // const [deleteError, setDeleteError] = useState<string[] | null>(null);
 
   // Fetch the current user's listings when the page loads
   useEffect(() => {
@@ -36,6 +38,24 @@ export default function MyListingsPage() {
     loadListings();
   }, []);
 
+  // async function onDelete(id: number): Promise<void> {
+  //   setDeleteError(null);
+
+  //   try {
+  //     await deleteListing(id);
+
+  //     setListings((prev) =>
+  //       prev.filter((listing) => listing.listing_id !== id)
+  //     );
+  //   } catch (error) {
+  //     setDeleteError(
+  //       error instanceof ListingError
+  //         ? error.errors.map((err) => err.message)
+  //         : ["Unable to delete listing. Please try again later."]
+  //     );
+  //   }
+  // }
+
   // Show a loading message while data is being fetched
   if (loading) {
     return <p>Loading listings...</p>;
@@ -44,11 +64,6 @@ export default function MyListingsPage() {
   // Show an error message if the request failed
   if (error) {
     return <p>{error}</p>;
-  }
-
-  // Show a message if the user has no listings
-  if (listings.length === 0) {
-    return <p>You don't have any listings yet.</p>;
   }
 
   return (
@@ -65,10 +80,28 @@ export default function MyListingsPage() {
         </button>
       </div>
 
-      <ListingGrid
-        listings={listings}
-        getLink={(listing) => `/my-listings/${listing.listing_id}`} />
+      {/* {deleteError && (
+        <div className={styles.alert} role="alert">
+          <ul>
+            {deleteError.map((error, i) => (
+              <li key={i}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )} */}
 
+      {listings.length === 0 
+      ? 
+        <>
+          <p>You do not have any listings yet.</p>
+        </> 
+      :
+        <ListingGrid
+          listings={listings}
+          getLink={(listing) => `/my-listings/${listing.listing_id}`}
+          // onDelete={onDelete} 
+          />
+      }
     </div>
   );
 }
