@@ -22,7 +22,7 @@ class ListingService:
             max_guests=dto.max_guests,
             bedrooms=dto.bedrooms,
             bathrooms=dto.bathrooms,
-            is_published=True, 
+            is_published=dto.is_published, 
             address=dto.address,
             city=dto.city,
             state=dto.state,

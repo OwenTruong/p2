@@ -21,7 +21,7 @@ def create_listing(
     
     return ListingResponseDTO.model_validate(created_listing)
 
-@router.delete("/{listing_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{listing_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_listing(
     listing_id: int,
     current_user: AuthenticatedUser = Depends(get_current_user)
@@ -52,6 +52,7 @@ def delete_listing(
                 }
             ]
         })
+        
 @router.put("/{id}", response_model=ListingResponseDTO, status_code=status.HTTP_200_OK)
 def update_listing(
     id: int,

@@ -5,11 +5,13 @@ import styles from "./ListingGrid.module.css";
 interface ListingGridProps {
   listings: Listing[];
   getLink: (listing: Listing) => string;
+  // onDelete?: (id: number) => Promise<void>;
 }
 
 export default function ListingGrid({
   listings,
-  getLink
+  getLink,
+  // onDelete
 }: ListingGridProps) {
   return (
 
@@ -20,6 +22,7 @@ export default function ListingGrid({
           key={listing.listing_id}
           listing={listing}
           linkNav={getLink(listing)}
+          // onDelete={onDelete}
         />
       ))}
     </div>

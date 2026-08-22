@@ -1,4 +1,6 @@
 .card {
+    position: relative;
+
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -62,4 +64,33 @@
 .unpublished {
     background-color: #f3f4f6;
     color: #4b5563;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+  background: white;
+
+  color: #dc2626;
+  cursor: pointer;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  z-index: 5;
+}
+
+.deleteButton:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
 }

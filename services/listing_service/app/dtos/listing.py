@@ -15,7 +15,8 @@ class ListingCreateRequestDTO(BaseModel):
     city: str = Field(..., min_length=1, max_length=100, examples=["New Orleans"])
     state: str = Field(..., examples=["LA"])
     zip_code: str = Field(..., examples=["70112"])
-
+    is_published: bool
+    
     @field_validator("state")
     @classmethod
     def validate_state(cls, v: str) -> str:
